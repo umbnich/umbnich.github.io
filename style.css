@@ -10,7 +10,7 @@ body {
 
 header, footer {
   text-align: center;
-  padding: 20px;
+  padding: 10px 20px;
   background-color: #222222;
 }
 
@@ -25,16 +25,18 @@ header, footer {
 
 .sticky-links {
   position: sticky;
-  top: 120px; /* regola in base all'altezza dell'header */
+  top: 72px;
   z-index: 999;
   background-color: #1a1a1a;
-  padding: 10px 0;
+  padding: 8px 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   text-align: center;
 }
 
 .sticky-links a img {
-  margin: 0 10px;
+  margin: 0 8px;
+  width: 28px;
+  height: 28px;
   transition: transform 0.2s ease;
 }
 
@@ -46,30 +48,37 @@ header, footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 12px;
   flex-wrap: nowrap;
-  margin-bottom: 10px;
+  padding: 5px 0;
 }
 
-.profile-pic {
-  width: 100px;
-  height: 100px;
+.profile-pic.small {
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #c0a96f;
 }
 
-h1 {
-  font-size: 2.5rem;
-  margin-bottom: 0.2em;
+.title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.small-title {
+  font-size: 1.4rem;
+  margin: 0;
   color: #f4f4f4;
 }
 
-p.subtitle {
-  font-size: 1.2rem;
-  margin-top: 0;
-  opacity: 0.8;
+.small-subtitle {
+  font-size: 0.85rem;
+  margin: 2px 0 0;
   color: #c0c0c0;
+  opacity: 0.8;
 }
 
 #portfolio {
@@ -124,6 +133,7 @@ footer {
   opacity: 0.6;
   background-color: #111;
   color: #ccc;
+  padding: 15px;
 }
 
 @media (max-width: 480px) {
@@ -132,13 +142,13 @@ footer {
     flex-direction: column;
   }
 
-  .profile-pic {
+  .profile-pic.small {
     width: 80px;
     height: 80px;
   }
 
   .sticky-links {
-    top: 140px;
+    top: 100px;
   }
 }
 
