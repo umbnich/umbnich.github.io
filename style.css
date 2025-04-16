@@ -3,26 +3,28 @@
 body {
   margin: 0;
   font-family: 'Ubuntu', sans-serif;
-  background-color: #0d1b2a;
-  color: #ffffff;
+  background-color: #1a1a1a;
+  color: #e0e0e0;
   line-height: 1.6;
 }
 
 header, footer {
   text-align: center;
   padding: 20px;
-  background-color: #1b263b;
+  background-color: #222222;
 }
 
 h1 {
   font-size: 2.5rem;
   margin-bottom: 0.2em;
+  color: #f4f4f4;
 }
 
 p.subtitle {
   font-size: 1.2rem;
   margin-top: 0;
   opacity: 0.8;
+  color: #c0c0c0;
 }
 
 .links {
@@ -34,8 +36,8 @@ p.subtitle {
   display: inline-block;
   margin: 10px;
   padding: 12px 24px;
-  background-color: #00b4d8;
-  color: white;
+  background-color: #c0a96f;
+  color: #1a1a1a;
   text-decoration: none;
   border-radius: 8px;
   font-weight: bold;
@@ -43,7 +45,7 @@ p.subtitle {
 }
 
 .links a:hover {
-  background-color: #0096c7;
+  background-color: #b69750;
 }
 
 #portfolio {
@@ -56,33 +58,48 @@ p.subtitle {
   text-align: center;
   margin-bottom: 30px;
   font-size: 2rem;
-  color: #00b4d8;
+  color: #c0a96f;
 }
 
 .project {
-  background-color: #1b263b;
+  background-color: #2a2a2a;
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 30px;
-  box-shadow: 0 4px 8px rgba(0, 180, 216, 0.2);
+  box-shadow: 0 4px 8px rgba(192, 169, 111, 0.2);
 }
 
 .project img {
   max-width: 100%;
   border-radius: 8px;
-  border: 2px solid #00b4d8;
+  border: 2px solid #c0a96f;
 }
 
 .project h3 {
   margin-top: 15px;
-  color: #ffffff;
+  color: #f4f4f4;
+}
+
+.project ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.project li {
+  margin: 5px 0;
+  color: #cccccc;
+}
+
+.project li strong {
+  color: #c0a96f;
 }
 
 footer {
   font-size: 0.9rem;
   opacity: 0.6;
-  background-color: #0d1b2a;
-  color: #ffffff;
+  background-color: #111;
+  color: #ccc;
 }
 
 @media (min-width: 768px) {
