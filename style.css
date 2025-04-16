@@ -1,44 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swap');
 
-.profile-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: nowrap; /* forza la foto a stare di fianco anche su schermi piccoli */
-  margin-bottom: 10px;
-}
-
-.sticky-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background-color: #222222;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease-in-out;
-}
-
-.profile-pic {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #c0a96f;
-}
-
-@media (max-width: 480px) {
-  .profile-header {
-    flex-wrap: wrap; /* su smartphone piccolissimi torna sopra */
-    flex-direction: column;
-  }
-
-  .profile-pic {
-    width: 80px;
-    height: 80px;
-  }
-}
-
-
 body {
   margin: 0;
   font-family: 'Ubuntu', sans-serif;
@@ -53,6 +14,51 @@ header, footer {
   background-color: #222222;
 }
 
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #222222;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease-in-out;
+}
+
+.sticky-links {
+  position: sticky;
+  top: 120px; /* regola in base all'altezza dell'header */
+  z-index: 999;
+  background-color: #1a1a1a;
+  padding: 10px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.sticky-links a img {
+  margin: 0 10px;
+  transition: transform 0.2s ease;
+}
+
+.sticky-links a img:hover {
+  transform: scale(1.15);
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: nowrap;
+  margin-bottom: 10px;
+}
+
+.profile-pic {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #c0a96f;
+}
+
 h1 {
   font-size: 2.5rem;
   margin-bottom: 0.2em;
@@ -64,27 +70,6 @@ p.subtitle {
   margin-top: 0;
   opacity: 0.8;
   color: #c0c0c0;
-}
-
-.links {
-  text-align: center;
-  margin: 30px 0;
-}
-
-.links a {
-  display: inline-block;
-  margin: 10px;
-  padding: 12px 24px;
-  background-color: #c0a96f;
-  color: #1a1a1a;
-  text-decoration: none;
-  border-radius: 8px;
-  font-weight: bold;
-  transition: background 0.3s;
-}
-
-.links a:hover {
-  background-color: #b69750;
 }
 
 #portfolio {
@@ -139,6 +124,22 @@ footer {
   opacity: 0.6;
   background-color: #111;
   color: #ccc;
+}
+
+@media (max-width: 480px) {
+  .profile-header {
+    flex-wrap: wrap;
+    flex-direction: column;
+  }
+
+  .profile-pic {
+    width: 80px;
+    height: 80px;
+  }
+
+  .sticky-links {
+    top: 140px;
+  }
 }
 
 @media (min-width: 768px) {
