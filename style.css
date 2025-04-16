@@ -55,6 +55,8 @@ p.subtitle {
 #portfolio h2 {
   text-align: center;
   margin-bottom: 30px;
+  font-size: 2rem;
+  color: #00b4d8;
 }
 
 .project {
@@ -62,6 +64,7 @@ p.subtitle {
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 30px;
+  box-shadow: 0 4px 8px rgba(0, 180, 216, 0.2);
 }
 
 .project img {
@@ -72,11 +75,14 @@ p.subtitle {
 
 .project h3 {
   margin-top: 15px;
+  color: #ffffff;
 }
 
 footer {
   font-size: 0.9rem;
   opacity: 0.6;
+  background-color: #0d1b2a;
+  color: #ffffff;
 }
 
 @media (min-width: 768px) {
