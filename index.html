@@ -1,15 +1,22 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>umbnich | Portfolio</title>
   <link rel="stylesheet" href="style.css">
+  <script defer src="script.js"></script>
 </head>
+
+<div id="imageModal" class="modal">
+  <span class="modal-close">&times;</span>
+  <img class="modal-content" id="modalImg" alt="zoomed project">
+</div>
+
 <body>
   <header class="sticky-header">
     <div class="profile-header compact">
-      <img src="img/photo_profile.jpg" alt="Foto Umberto Nicholas Severino" class="profile-pic small">
+      <img src="img/photo_profile.jpg" alt="umbnich" class="profile-pic small clickable-image" data-img>
       <div class="title-block">
         <h1 class="small-title">Umberto Nicholas Severino</h1>
         <p class="subtitle small-subtitle">Mechatronics Engineer • Project Manager • Concept Designer</p>
@@ -34,47 +41,87 @@
   <section id="portfolio">
     <h2>Portfolio</h2>
 
-    <div class="project">
-      <img src="img/progetto1.jpg" alt="Progetto 1">
+    <div class="project" data-year="2025">
+      <div class="clickable-image">
+        <img src="img/progetto_devss.jpg" alt="Progetto DEVSS UNIPA">
+      </div>
       <div>
-        <h3>Lorem Ipsum Project 1</h3>
+        <h3> Training - ASV DEVSS v3</h3>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque vehicula, urna non feugiat dapibus, sapien justo suscipit massa, at luctus nisi velit nec lorem.</p>
         <ul>
-          <li><strong>Stato:</strong> In corso</li>
-          <li><strong>Periodo:</strong> Gennaio 2024 – presente</li>
-          <li><strong>Affiliazione:</strong> Lorem Industries / Ipsum Lab</li>
-          <li><strong>Ruolo:</strong> Progettista e coordinatore tecnico</li>
+          <li><strong>Status:</strong> Completed</li>
+          <li><strong>Period:</strong> February 2025</li>
+          <li><strong>Affiliation:</strong> 3D Research srl, University of Palermo, NBFC</li>
+          <li><strong>Role:</strong> Tester and trainer</li>
         </ul>
       </div>
     </div>
 
-    <div class="project">
-      <img src="img/progetto2.jpg" alt="Progetto 2">
+    <div class="project" data-year="2023">
+      <div class="clickable-image">
+        <img src="img/progetto_2.jpg" alt="Progetto 2">
+      </div>
       <div>
         <h3>Lorem Ipsum Project 2</h3>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris feugiat justo at sapien scelerisque, sed viverra massa tincidunt.</p>
         <ul>
-          <li><strong>Stato:</strong> Concluso</li>
-          <li><strong>Periodo:</strong> Maggio 2023 – Dicembre 2023</li>
-          <li><strong>Affiliazione:</strong> Ipsum Tech / Collaborazione universitaria</li>
-          <li><strong>Ruolo:</strong> Sviluppatore software e responsabile integrazione</li>
+          <li><strong>Status:</strong> Concluso</li>
+          <li><strong>Period:</strong> Maggio 2023 – Dicembre 2023</li>
+          <li><strong>Affiliation:</strong> Ipsum Tech / Collaborazione universitaria</li>
+          <li><strong>Role:</strong> Sviluppatore software e responsabile integrazione</li>
         </ul>
       </div>
     </div>
 
-    <div class="project">
-      <img src="img/progetto3.jpg" alt="Progetto 3">
+    <div class="project" data-year="2025">
+      <div class="clickable-image">
+        <img src="img/progetto_3.jpg" alt="Progetto 3">
+      </div>
       <div>
         <h3>Lorem Ipsum Project 3</h3>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. Sed euismod urna vel felis iaculis, vitae imperdiet elit commodo.</p>
         <ul>
-          <li><strong>Stato:</strong> Da avviare</li>
-          <li><strong>Periodo:</strong> In pianificazione – Q3 2025</li>
-          <li><strong>Affiliazione:</strong> Progetto indipendente / Ricerca personale</li>
-          <li><strong>Ruolo:</strong> Analista, designer e sviluppatore full-stack</li>
+          <li><strong>Status:</strong> Da avviare</li>
+          <li><strong>Period:</strong> In pianificazione – Q3 2025</li>
+          <li><strong>Affiliation:</strong> Project indipendente / Ricerca personale</li>
+          <li><strong>Role:</strong> Analista, designer e sviluppatore full-stack</li>
         </ul>
       </div>
     </div>
+
+
+    <div class="project" data-year="2024">
+      <div class="clickable-image">
+        <img src="img/progetto_3.jpg" alt="Progetto 3">
+      </div>
+      <div>
+        <h3>Lorem Ipsum Project 4</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque vehicula, urna non feugiat dapibus, sapien justo suscipit massa, at luctus nisi velit nec lorem.</p>
+        <ul>
+          <li><strong>Status:</strong> In corso</li>
+          <li><strong>Period:</strong> Gennaio 2024 – presente</li>
+          <li><strong>Affiliation:</strong> Lorem Industries / Ipsum Lab</li>
+          <li><strong>Role:</strong> Progettista e coordinatore tecnico</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="project" data-year="2021">
+      <div class="clickable-image">
+        <img src="img/progetto_devss2021.jpg" alt="Progetto DEVSS 2021">
+      </div>
+      <div>
+        <h3>SeaForest LIFE    </h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque vehicula, urna non feugiat dapibus, sapien justo suscipit massa, at luctus nisi velit nec lorem.</p>
+        <ul>
+          <li><strong>Status:</strong> Completed</li>
+          <li><strong>Period:</strong> June 2021 </li>
+          <li><strong>Affiliation:</strong> 3D Research srl, ISPRA</li>
+          <li><strong>Role:</strong> ASV Pilot</li>
+        </ul>
+      </div>
+    </div>
+
   </section>
 
   <footer>

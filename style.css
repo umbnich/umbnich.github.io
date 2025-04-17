@@ -1,27 +1,30 @@
+/* ===================== */
+/* STILE GENERALE       */
+/* ===================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swap');
 
-body {
+html, body {
   margin: 0;
+  padding: 0;
   font-family: 'Ubuntu', sans-serif;
   background-color: #1a1a1a;
   color: #e0e0e0;
   line-height: 1.6;
+  min-height: 100%;
 }
 
-header, footer {
-  text-align: center;
-  padding: 10px 20px;
-  background-color: #222222;
-}
+/* ===================== */
+/* HEADER E LINK STICKY */
+/* ===================== */
 
 .sticky-header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background-color: #222222;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease-in-out;
+  background-color: #222;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  padding: 10px 20px;
 }
 
 .sticky-links {
@@ -30,7 +33,6 @@ header, footer {
   z-index: 999;
   background-color: #1a1a1a;
   padding: 8px 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   text-align: center;
 }
 
@@ -50,11 +52,19 @@ header, footer {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  flex-wrap: nowrap;
-  padding: 5px 0;
+  padding: 8px;
 }
 
 .profile-pic.small {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #c0a96f;
+  cursor: zoom-in;
+}
+
+.clickable-image-profile {
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -82,6 +92,10 @@ header, footer {
   opacity: 0.8;
 }
 
+/* ===================== */
+/* TIMELINE E PROGETTI  */
+/* ===================== */
+
 #portfolio {
   padding: 40px 20px;
   max-width: 1000px;
@@ -95,22 +109,61 @@ header, footer {
   color: #c0a96f;
 }
 
+.timeline-container {
+  position: relative;
+  padding-left: 50px;
+  border-left: 2px solid #c0a96f;
+  margin-left: 10px;
+}
+
 .project {
+  position: relative;
+  margin-bottom: 40px;
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
   background-color: #2a2a2a;
   border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 30px;
+  padding: 0;
+  overflow: hidden;
   box-shadow: 0 4px 8px rgba(192, 169, 111, 0.2);
 }
 
-.project img {
-  max-width: 100%;
-  border-radius: 8px;
-  border: 2px solid #c0a96f;
+.clickable-image {
+  width: 200px;
+  height: auto;
+  display: flex;
+}
+
+.clickable-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: none;
+  border-right: 2px solid #c0a96f;
+  cursor: zoom-in;
+}
+
+.project > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+}
+
+.project::before {
+  content: attr(data-year);
+  position: absolute;
+  left: -50px;
+  top: 0;
+  font-weight: bold;
+  color: #c0a96f;
+  font-size: 1rem;
 }
 
 .project h3 {
-  margin-top: 15px;
+  margin-top: 0;
   color: #f4f4f4;
 }
 
@@ -129,42 +182,86 @@ header, footer {
   color: #c0a96f;
 }
 
+/* ===================== */
+/* MODAL IMAGE VIEW     */
+/* ===================== */
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.9);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  max-width: 90%;
+  max-height: 90%;
+  border: 4px solid #c0a96f;
+  border-radius: 8px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  color: #fff;
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.modal-close:hover {
+  color: #c0a96f;
+}
+
+/* ===================== */
+/* FOOTER               */
+/* ===================== */
+
 footer {
   font-size: 0.9rem;
   opacity: 0.6;
   background-color: #111;
   color: #ccc;
   padding: 15px;
+  text-align: center;
 }
 
-@media (max-width: 480px) {
-  .profile-header {
-    flex-wrap: wrap;
-    flex-direction: column;
-  }
+/* ===================== */
+/* RESPONSIVE           */
+/* ===================== */
 
-  .profile-pic.small {
-    width: 80px;
-    height: 80px;
-  }
-
-  .sticky-links {
-    top: 100px;
-  }
-}
-
-@media (min-width: 768px) {
+@media (max-width: 768px) {
   .project {
-    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 20px;
+    text-align: center;
   }
 
-  .project img {
-    width: 40%;
+  .clickable-image {
+    width: 100%;
   }
 
-  .project div {
-    width: 60%;
+  .clickable-image img {
+    border: none;
+    border-bottom: 2px solid #c0a96f;
+  }
+
+  .project::before {
+    left: -40px;
+    top: -10px;
+  }
+
+  .timeline-container {
+    padding-left: 30px;
+    margin-left: 0;
   }
 }
