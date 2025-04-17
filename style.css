@@ -3,24 +3,18 @@
 body {
   margin: 0;
   font-family: 'Ubuntu', sans-serif;
-  background-color: #1a1a1a;
+  background: linear-gradient(to bottom, #1a1a1a 0%, #0e0e0e 100%);
+  background-attachment: fixed;
   color: #e0e0e0;
   line-height: 1.6;
-}
-
-header, footer {
-  text-align: center;
-  padding: 10px 20px;
-  background-color: #222222;
 }
 
 .sticky-header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background-color: #222222;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease-in-out;
+  background-color: #222;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .sticky-links {
@@ -29,7 +23,6 @@ header, footer {
   z-index: 999;
   background-color: #1a1a1a;
   padding: 8px 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   text-align: center;
 }
 
@@ -49,8 +42,7 @@ header, footer {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  flex-wrap: nowrap;
-  padding: 5px 0;
+  padding: 8px;
 }
 
 .profile-pic.small {
@@ -65,7 +57,6 @@ header, footer {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
 }
 
 .small-title {
@@ -95,11 +86,19 @@ header, footer {
 }
 
 .project {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.6s ease-out;
   background-color: #2a2a2a;
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 30px;
-  box-shadow: 0 4px 8px rgba(192, 169, 111, 0.2);
+  box-shadow: 0 4px 8px rgba(192,169,111,0.2);
+}
+
+.project.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .project img {
@@ -134,22 +133,6 @@ footer {
   background-color: #111;
   color: #ccc;
   padding: 15px;
-}
-
-@media (max-width: 480px) {
-  .profile-header {
-    flex-wrap: wrap;
-    flex-direction: column;
-  }
-
-  .profile-pic.small {
-    width: 80px;
-    height: 80px;
-  }
-
-  .sticky-links {
-    top: 100px;
-  }
 }
 
 @media (min-width: 768px) {
