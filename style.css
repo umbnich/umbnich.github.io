@@ -123,10 +123,10 @@ html, body {
   gap: 20px;
   align-items: stretch;
   background-color: #2a2a2a;
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 0;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(192, 169, 111, 0.2);
+  box-shadow: 0 4px 8px rgba(92, 69, 11, 0.2);
 }
 
 .clickable-image {
