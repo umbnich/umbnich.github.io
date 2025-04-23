@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const timelineContainer = document.querySelector(".timeline-container") || container;
 
       // Pulisce il container
-      container.innerHTML = '<h2>Portfolio</h2>';
+      container.innerHTML = '<h2>PORTFOLIO</h2>';
 
       // Ordina per anno decrescente
       data.sort((a, b) => b.anno - a.anno);
