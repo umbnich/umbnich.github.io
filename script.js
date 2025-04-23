@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-fetch('progetti.json')
+fetch('projects.json')
   .then(response => response.json())
   .then(data => {
     const container = document.getElementById("portfolio");
