@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // === CARICA I PROGETTI E COSTRUISCI IL PORTFOLIO ===
-  fetch('projects.json')
+  fetch("projects.json?ts=" + Date.now())
     .then(response => response.json())
     .then(data => {
       const container = document.getElementById("portfolio");
