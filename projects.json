@@ -9,11 +9,20 @@
     "img": "img/progetto_devss.jpg"
   },
   {
+    "titolo": "Amphitrite",
+    "descrizione": "Mapping of underwater cultural heritage sites using optical and acoustic imaging technologies",
+    "anno": 2024,
+    "periodo": "2022-2025",
+    "affiliazione": "3D Research srl; Università della Calabria; MiC - Soprintendenza Nazionale per il Patrimonio Culturale Subacqueo",
+    "ruolo": "ASV/ROV pilot; Underwater photogrammetrist;",
+    "img": "img/"
+  },
+  {
     "titolo": "SeaForest LIFE",
     "descrizione": "Test su ASV per monitoraggio ambientale marino.",
     "anno": 2021,
     "periodo": "Giugno 2021",
-    "affiliazione": "3D Research; ISPRA",
+    "affiliazione": "3D Research srl; ISPRA",
     "ruolo": "ASV Pilot",
     "img": "img/progetto_devss2021.jpg"
   }
