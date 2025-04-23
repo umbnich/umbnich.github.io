@@ -45,4 +45,37 @@ document.addEventListener("DOMContentLoaded", () => {
       timelineContainer.appendChild(dot);
     });
   });
+
+fetch('progetti.json')
+  .then(response => response.json())
+  .then(data => {
+    const container = document.getElementById("portfolio");
+
+    data.sort((a, b) => b.anno - a.anno);
+
+    data.forEach(progetto => {
+      const el = document.createElement("div");
+      el.className = "project";
+      el.setAttribute("data-year", progetto.anno);
+
+      el.innerHTML = `
+        <div class="clickable-image">
+          <img src="${progetto.img}" alt="${progetto.titolo}" data-img>
+        </div>
+        <div>
+          <h3>${progetto.titolo}</h3>
+          <p>${progetto.descrizione}</p>
+          <ul>
+            <li><strong>Status:</strong> ${progetto.status || 'In corso'}</li>
+            <li><strong>Periodo:</strong> ${progetto.periodo}</li>
+            <li><strong>Affiliazione:</strong> ${progetto.affiliazione}</li>
+            <li><strong>Ruolo:</strong> ${progetto.ruolo}</li>
+          </ul>
+        </div>
+      `;
+
+      container.appendChild(el);
+    });
+  });
+
   
