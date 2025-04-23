@@ -1,9 +1,9 @@
 [
   {
     "titolo": "Training - ASV DEVSS v3",
-    "descrizione": "Attività di training e collaudo su veicolo autonomo.",
+    "descrizione": "Training and testing of the ASV shipped to the University of Calabria",
     "anno": 2025,
-    "periodo": "Febbraio 2025",
+    "periodo": "February 2025",
     "affiliazione": "3D Research srl; UNIPA; National Biodiversity Future Center (NBFC)",
     "ruolo": "Tester e trainer",
     "img": "img/progetto_devss.jpg"
@@ -19,9 +19,9 @@
   },
   {
     "titolo": "SeaForest LIFE",
-    "descrizione": "Test su ASV per monitoraggio ambientale marino.",
+    "descrizione": "Environmental monitoring of Posidonia oceanica.",
     "anno": 2021,
-    "periodo": "Giugno 2021",
+    "periodo": "June 2021",
     "affiliazione": "3D Research srl; ISPRA",
     "ruolo": "ASV Pilot",
     "img": "img/progetto_devss2021.jpg"
