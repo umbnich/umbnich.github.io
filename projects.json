@@ -1,0 +1,20 @@
+[
+  {
+    "titolo": "Training - ASV DEVSS v3",
+    "descrizione": "Attività di training su veicolo autonomo...",
+    "anno": 2025,
+    "periodo": "Febbraio 2025",
+    "affiliazione": "3D Research srl, UNIPA",
+    "ruolo": "Tester e trainer",
+    "img": "img/progetto_devss.jpg"
+  },
+  {
+    "titolo": "SeaForest LIFE",
+    "descrizione": "Test su ASV per monitoraggio ambientale marino...",
+    "anno": 2021,
+    "periodo": "Giugno 2021",
+    "affiliazione": "3D Research, ISPRA",
+    "ruolo": "ASV Pilot",
+    "img": "img/progetto_devss2021.jpg"
+  }
+]
