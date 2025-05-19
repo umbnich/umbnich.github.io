@@ -87,6 +87,6 @@
     "periodo": "June 2020",
     "affiliazione": "3D Research srl; ISPRA",
     "ruolo": "ASV Pilot",
-    "img": src="https://drive.google.com/file/d/1Y7wGjjAo6Pk9Zwy28qYjbTx8cRH8mbYi" alt="image of the ASV with umbnich the amazing pilot"
+    "img": <src="https://drive.google.com/file/d/1Y7wGjjAo6Pk9Zwy28qYjbTx8cRH8mbYi" alt="image of the ASV with umbnich the amazing pilot">
   }
 ]
