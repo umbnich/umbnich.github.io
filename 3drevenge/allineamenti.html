@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Tabella Allineamenti</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    table {
+      margin: 30px auto;
+      border-collapse: collapse;
+    }
+
+    td {
+      width: 120px;
+      height: 80px;
+      border: 1px solid #999;
+      vertical-align: middle;
+      text-align: center;
+      position: relative;
+    }
+
+    .icon {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      font-size: 20px;
+    }
+  </style>
+
+  <script>
+    // 🔐 Controllo accesso base
+    if (!sessionStorage.getItem("loggedIn")) {
+      alert("Accesso negato! Torna al login.");
+      window.location.href = "index.html";
+    }
+
+    // 👤 Utente loggato (simulato con sessionStorage)
+    const currentUser = sessionStorage.getItem("username");
+
+    // 🎯 Ogni utente ha una propria icona
+    const userIcons = {
+      "admin": "🛡️",
+      "mario": "⚔️",
+      "luca": "🧙",
+      "utente1": "🐉",
+      "utente2": "🧝‍♂️"
+    };
+
+    window.onload = function () {
+      const cell = document.getElementById("neutral-neutral");
+      if (currentUser && userIcons[currentUser]) {
+        const icon = document.createElement("div");
+        icon.className = "icon";
+        icon.textContent = userIcons[currentUser];
+        cell.appendChild(icon);
+      }
+    };
+  </script>
+</head>
+<body>
+  <h1>Allineamenti D&D</h1>
+  <table>
+    <tr>
+      <td>Lawful Good</td>
+      <td>Neutral Good</td>
+      <td>Chaotic Good</td>
+    </tr>
+    <tr>
+      <td>Lawful Neutral</td>
+      <td id="neutral-neutral">Neutral</td>
+      <td>Chaotic Neutral</td>
+    </tr>
+    <tr>
+      <td>Lawful Evil</td>
+      <td>Neutral Evil</td>
+      <td>Chaotic Evil</td>
+    </tr>
+  </table>
+</body>
+</html>
