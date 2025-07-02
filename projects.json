@@ -1,7 +1,7 @@
 [
   {
     "titolo": "Training - ASV DEVSS v3",
-    "descrizione": "Training and testing of the ASV shipped to the University of Calabria",
+    "descrizione": "Training and testing of the ASV shipped from the University of Calabria to University of Palermo.",
     "anno": 2025,
     "periodo": "February 2025",
     "affiliazione": "3D Research srl; UNIPA; National Biodiversity Future Center (NBFC)",
@@ -18,10 +18,73 @@
     "img": "img/"
   },
   {
-    "titolo": "SeaForest LIFE",
+    "titolo": "CREAMARE - Bulgaria",
+    "descrizione": "Culture and media technologies in the transnational co-production of digital interactive products for the communication of maritime and UCH.",
+    "anno": 2024,
+    "periodo": "June 2024",
+    "affiliazione": "3D Research srl; Università della Calabria",
+    "ruolo": "Underwater Photogrammetry Tutoring",
+    "img": "img/..."
+  },
+  {
+    "titolo": "CREAMARE - Montenegro",
+    "descrizione": "Culture and media technologies in the transnational co-production of digital interactive products for the communication of maritime and UCH.",
+    "anno": 2024,
+    "periodo": "May 2024",
+    "affiliazione": "3D Research srl; Università della Calabria",
+    "ruolo": "Underwater Photogrammetry Tutoring",
+    "img": "img/..."
+  },
+  {
+    "titolo": "CREAMARE - Spain",
+    "descrizione": "Culture and media technologies in the transnational co-production of digital interactive products for the communication of maritime and UCH.",
+    "anno": 2023,
+    "periodo": "Nov 2023",
+    "affiliazione": "3D Research srl; Università della Calabria",
+    "ruolo": "Underwater Photogrammetry Tutoring",
+    "img": "img/..."
+  },
+  {
+    "titolo": "FISR - CresciBlueReef",
+    "descrizione": "ROV coring system for coralligenous biostructures",
+    "anno": 2023,
+    "periodo": "Oct 2023",
+    "affiliazione": "3D Research srl; Università della Calabria",
+    "ruolo": "ROV pilot",
+    "img": "img/..."
+  },
+  {
+    "titolo": "Project TECTONIC - Croatia",
+    "descrizione": "MSCA TECTONIC - Dissemination and exploitation of UCHs.",
+    "anno": 2023,
+    "periodo": "Oct 2022 - July 2023",
+    "affiliazione": "3D Research srl; Università della Calabria; H2O Robotics",
+    "ruolo": "Visiting researcher",
+    "img": "img/..."
+  },
+  {
+    "titolo": "Project AUGUSTUS - Sicily",
+    "descrizione": "Digitalization of Cultural Heritage.",
+    "anno": 2022,
+    "periodo": "August 2022",
+    "affiliazione": "3D Research srl",
+    "ruolo": "Photogrammetrist",
+    "img": "img/..."
+  },
+  {
+    "titolo": "SeaForest LIFE - Sardinia",
     "descrizione": "Environmental monitoring of Posidonia oceanica.",
     "anno": 2021,
-    "periodo": "June 2021",
+    "periodo": "May 2020",
+    "affiliazione": "3D Research srl; ISPRA",
+    "ruolo": "ASV Pilot",
+    "img": "img/progetto_devss2021.jpg"
+  },
+  {
+    "titolo": "SeaForest LIFE - Cilento",
+    "descrizione": "Environmental monitoring of Posidonia oceanica.",
+    "anno": 2020,
+    "periodo": "June 2020",
     "affiliazione": "3D Research srl; ISPRA",
     "ruolo": "ASV Pilot",
     "img": "img/progetto_devss2021.jpg"
