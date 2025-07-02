@@ -15,6 +15,7 @@
 
     .grid-section {
       text-align: center;
+      flex-grow: 1;
     }
 
     h1 {
@@ -26,6 +27,7 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
       max-width: 600px;
+      margin: auto;
     }
 
     .cell {
@@ -64,12 +66,12 @@
       transform: translate(-50%, -50%);
     }
 
-    .sidebar {
+    .sidebar, .voting-panel {
       width: 250px;
       font-size: 14px;
     }
 
-    .sidebar h2 {
+    .sidebar h2, .voting-panel h2 {
       font-size: 16px;
       margin-bottom: 10px;
     }
@@ -77,132 +79,159 @@
     .history-entry {
       margin-bottom: 10px;
     }
+
+    .vote-box {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+    }
+
+    .vote-box select,
+    .vote-box textarea {
+      width: 100%;
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+
+    .vote-box button {
+      padding: 5px 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
   </style>
 
   <script>
-    // Accesso
-    if (!sessionStorage.getItem("loggedIn")) {
-      alert("Accesso negato! Torna al login.");
-      window.location.href = "index.html";
+    const alignments = [
+      "Lawful Good", "Neutral Good", "Chaotic Good",
+      "Lawful Neutral", "Neutral", "Chaotic Neutral",
+      "Lawful Evil", "Neutral Evil", "Chaotic Evil"
+    ];
+
+    function alignmentToCell(alignment) {
+      const index = alignments.indexOf(alignment);
+      if (index === -1) return null;
+      const mainRow = Math.floor(index / 3);
+      const mainCol = index % 3;
+      return `cell-${mainRow}-${mainCol}-1-1`;
     }
 
-    const currentUser = sessionStorage.getItem("username");
-
-    const userIcons = {
-      "admin": "🛡️",
-      "manuel.fortunato": "⚔️",
-      "francesco.buffone": "🧙",
-      "sara.serratore": "🐉",
-      "umbs": "🧝‍♂️",
-      "francesca.mazzuca": "🧝‍♀️"
-    };
-
-    const userPositions = {
-      "admin": { mainRow: 1, mainCol: 1, subRow: 1, subCol: 1 },
-      "manuel.fortunato": { mainRow: 1, mainCol: 1, subRow: 1, subCol: 1 },
-      "francesco.buffone": { mainRow: 1, mainCol: 1, subRow: 1, subCol: 1 },
-      "sara.serratore": { mainRow: 1, mainCol: 1, subRow: 1, subCol: 1 },
-      "umbs": { mainRow: 1, mainCol: 1, subRow: 1, subCol: 1 },
-      "francesca.mazzuca": { mainRow: 1, mainCol: 1, subRow: 1, subCol: 1 }
-    };
-
-    const previousPositions = {
-      "admin": { from: "Neutral", to: "Lawful Neutral" },
-      "manuel.fortunato": { from: "Neutral", to: "Neutral Good" },
-      "francesco.buffone": { from: "Neutral", to: "Chaotic Good" },
-      "sara.serratore": { from: "Neutral", to: "Neutral Evil" },
-      "umbs": { from: "Neutral", to: "Neutral Good" },
-      "francesca.mazzuca": { from: "Neutral", to: "Chaotic Neutral" }
-    };
-
-    function generateCellId(mainRow, mainCol, subRow, subCol) {
-      return `cell-${mainRow}-${mainCol}-${subRow}-${subCol}`;
+    async function loadData() {
+      const res = await fetch('data.json');
+      const data = await res.json();
+      return data.users;
     }
 
-    window.onload = function () {
-      // Posiziona tutti gli utenti nella griglia
-      for (const user in userIcons) {
-        const pos = userPositions[user];
-        const icon = document.createElement("div");
-        icon.className = "icon";
-        icon.textContent = userIcons[user];
+    function createIcon(iconChar) {
+      const icon = document.createElement("div");
+      icon.className = "icon";
+      icon.textContent = iconChar;
+      return icon;
+    }
 
-        const cellId = generateCellId(pos.mainRow, pos.mainCol, pos.subRow, pos.subCol);
-        const target = document.getElementById(cellId);
-        if (target) target.appendChild(icon);
+    window.onload = async function () {
+      if (!sessionStorage.getItem("loggedIn") || !sessionStorage.getItem("username")) {
+        alert("Accesso negato! Torna al login.");
+        window.location.href = "index.html";
+        return;
       }
 
-      // Mostra cronologia movimenti nella sidebar
+      const currentUser = sessionStorage.getItem("username");
+      const users = await loadData();
+
+      // Posizionamento icone
+      for (const user in users) {
+        const alignment = users[user].position.current;
+        const iconChar = users[user].icon;
+        const cellId = alignmentToCell(alignment);
+        if (cellId) {
+          const target = document.getElementById(cellId);
+          if (target) target.appendChild(createIcon(iconChar));
+        }
+      }
+
+      // Colonna sinistra: movimenti
       const historyContainer = document.getElementById("history");
-
-      for (const user in previousPositions) {
-        const { from, to } = previousPositions[user];
-        const icon = userIcons[user] || "❓";
-
+      for (const user in users) {
+        const { icon, position } = users[user];
         const entry = document.createElement("div");
         entry.className = "history-entry";
-        entry.innerText = `${icon} ${user}: ${from} → ${to}`;
+        entry.innerText = `${icon} ${user}: ${position.previous} → ${position.current}`;
         historyContainer.appendChild(entry);
+      }
+
+      // Colonna destra: votazione
+      const votingArea = document.getElementById("voting-area");
+      for (const user in users) {
+        if (user === currentUser) continue;
+
+        const icon = users[user].icon || "❓";
+        const container = document.createElement("div");
+        container.className = "vote-box";
+
+        const title = document.createElement("div");
+        title.innerHTML = `<strong>${icon} ${user}</strong>`;
+        container.appendChild(title);
+
+        const select = document.createElement("select");
+        alignments.forEach(alignment => {
+          const option = document.createElement("option");
+          option.value = alignment;
+          option.textContent = alignment;
+          select.appendChild(option);
+        });
+        container.appendChild(select);
+
+        const textarea = document.createElement("textarea");
+        textarea.rows = 2;
+        textarea.placeholder = "Motivazione...";
+        container.appendChild(textarea);
+
+        const button = document.createElement("button");
+        button.textContent = "Vota";
+        button.onclick = function () {
+          const voto = select.value;
+          const motivo = textarea.value;
+          console.log(`🗳️ Votazione per ${user}: ${voto}`);
+          console.log(`✏️ Motivazione: ${motivo}`);
+          alert(`Hai votato per spostare ${user} a "${voto}"\\nMotivazione: ${motivo}`);
+        };
+        container.appendChild(button);
+
+        votingArea.appendChild(container);
       }
     };
   </script>
 </head>
 <body>
+  <!-- Colonna sinistra -->
+  <div class="sidebar">
+    <h2>Movimenti</h2>
+    <div id="history"></div>
+  </div>
+
+  <!-- Centro -->
   <div class="grid-section">
     <h1>Tabella Allineamenti D&D</h1>
     <div class="grid">
-      <!-- Riga 0 -->
-      <div class="cell"><span class="label">Lawful Good</span><div class="subgrid">
-        <div class="subcell" id="cell-0-0-0-0"></div>
-        <div class="subcell" id="cell-0-0-0-1"></div>
-        <div class="subcell" id="cell-0-0-0-2"></div>
-        <div class="subcell" id="cell-0-0-1-0"></div>
-        <div class="subcell" id="cell-0-0-1-1"></div>
-        <div class="subcell" id="cell-0-0-1-2"></div>
-        <div class="subcell" id="cell-0-0-2-0"></div>
-        <div class="subcell" id="cell-0-0-2-1"></div>
-        <div class="subcell" id="cell-0-0-2-2"></div>
-      </div></div>
+      <!-- Griglia 3x3 -->
+      <div class="cell"><span class="label">Lawful Good</span><div class="subgrid"><div class="subcell" id="cell-0-0-1-1"></div></div></div>
+      <div class="cell"><span class="label">Neutral Good</span><div class="subgrid"><div class="subcell" id="cell-0-1-1-1"></div></div></div>
+      <div class="cell"><span class="label">Chaotic Good</span><div class="subgrid"><div class="subcell" id="cell-0-2-1-1"></div></div></div>
 
-      <div class="cell"><span class="label">Neutral Good</span><div class="subgrid">
-        <div class="subcell" id="cell-0-1-1-1"></div>
-      </div></div>
+      <div class="cell"><span class="label">Lawful Neutral</span><div class="subgrid"><div class="subcell" id="cell-1-0-1-1"></div></div></div>
+      <div class="cell"><span class="label">Neutral</span><div class="subgrid"><div class="subcell" id="cell-1-1-1-1"></div></div></div>
+      <div class="cell"><span class="label">Chaotic Neutral</span><div class="subgrid"><div class="subcell" id="cell-1-2-1-1"></div></div></div>
 
-      <div class="cell"><span class="label">Chaotic Good</span><div class="subgrid"></div></div>
-
-      <!-- Riga 1 -->
-      <div class="cell"><span class="label">Lawful Neutral</span><div class="subgrid">
-        <div class="subcell" id="cell-1-0-1-1"></div>
-      </div></div>
-
-      <div class="cell"><span class="label">Neutral</span><div class="subgrid">
-        <div class="subcell" id="cell-1-1-0-0"></div>
-        <div class="subcell" id="cell-1-1-0-1"></div>
-        <div class="subcell" id="cell-1-1-0-2"></div>
-        <div class="subcell" id="cell-1-1-1-0"></div>
-        <div class="subcell" id="cell-1-1-1-1"></div> <!-- centro -->
-        <div class="subcell" id="cell-1-1-1-2"></div>
-        <div class="subcell" id="cell-1-1-2-0"></div>
-        <div class="subcell" id="cell-1-1-2-1"></div>
-        <div class="subcell" id="cell-1-1-2-2"></div>
-      </div></div>
-
-      <div class="cell"><span class="label">Chaotic Neutral</span><div class="subgrid">
-        <div class="subcell" id="cell-1-2-1-1"></div>
-      </div></div>
-
-      <!-- Riga 2 -->
-      <div class="cell"><span class="label">Lawful Evil</span><div class="subgrid"></div></div>
-      <div class="cell"><span class="label">Neutral Evil</span><div class="subgrid">
-        <div class="subcell" id="cell-2-1-1-1"></div>
-      </div></div>
-      <div class="cell"><span class="label">Chaotic Evil</span><div class="subgrid"></div></div>
+      <div class="cell"><span class="label">Lawful Evil</span><div class="subgrid"><div class="subcell" id="cell-2-0-1-1"></div></div></div>
+      <div class="cell"><span class="label">Neutral Evil</span><div class="subgrid"><div class="subcell" id="cell-2-1-1-1"></div></div></div>
+      <div class="cell"><span class="label">Chaotic Evil</span><div class="subgrid"><div class="subcell" id="cell-2-2-1-1"></div></div></div>
     </div>
   </div>
 
-  <div class="sidebar">
-    <h2>Movimenti recenti</h2>
-    <div id="history"></div>
+  <!-- Colonna destra -->
+  <div class="voting-panel">
+    <h2>Vota</h2>
+    <div id="voting-area"></div>
   </div>
 </body>
 </html>
