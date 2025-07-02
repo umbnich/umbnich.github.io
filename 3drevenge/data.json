@@ -1,0 +1,58 @@
+{
+  "users": {
+    "umbs": {
+      "password": "abc123",
+      "icon": "🧝‍♂️",
+      "position": {
+        "previous": "Neutral",
+        "current": "Neutral Good"
+      },
+      "votes": []
+    },
+    "admin": {
+      "password": "adminpass",
+      "icon": "🛡️",
+      "position": {
+        "previous": "Neutral",
+        "current": "Lawful Neutral"
+      },
+      "votes": []
+    },
+    "manuel.fortunato": {
+      "password": "forte456",
+      "icon": "⚔️",
+      "position": {
+        "previous": "Neutral",
+        "current": "Neutral Good"
+      },
+      "votes": []
+    },
+    "francesco.buffone": {
+      "password": "buff123",
+      "icon": "🧙",
+      "position": {
+        "previous": "Neutral",
+        "current": "Chaotic Good"
+      },
+      "votes": []
+    },
+    "sara.serratore": {
+      "password": "sara321",
+      "icon": "🐉",
+      "position": {
+        "previous": "Neutral",
+        "current": "Neutral Evil"
+      },
+      "votes": []
+    },
+    "francesca.mazzuca": {
+      "password": "mazzuca456",
+      "icon": "🧝‍♀️",
+      "position": {
+        "previous": "Neutral",
+        "current": "Chaotic Neutral"
+      },
+      "votes": []
+    }
+  }
+}
