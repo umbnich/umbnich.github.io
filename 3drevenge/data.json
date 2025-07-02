@@ -5,16 +5,7 @@
       "icon": "🧝‍♂️",
       "position": {
         "previous": "Neutral",
-        "current": "Neutral Good"
-      },
-      "votes": []
-    },
-    "admin": {
-      "password": "adminpass",
-      "icon": "🛡️",
-      "position": {
-        "previous": "Neutral",
-        "current": "Lawful Neutral"
+        "current": "Neutral"
       },
       "votes": []
     },
@@ -23,7 +14,7 @@
       "icon": "⚔️",
       "position": {
         "previous": "Neutral",
-        "current": "Neutral Good"
+        "current": "Neutral"
       },
       "votes": []
     },
@@ -32,7 +23,7 @@
       "icon": "🧙",
       "position": {
         "previous": "Neutral",
-        "current": "Chaotic Good"
+        "current": "Neutral"
       },
       "votes": []
     },
@@ -41,7 +32,7 @@
       "icon": "🐉",
       "position": {
         "previous": "Neutral",
-        "current": "Neutral Evil"
+        "current": "Neutral"
       },
       "votes": []
     },
@@ -50,7 +41,7 @@
       "icon": "🧝‍♀️",
       "position": {
         "previous": "Neutral",
-        "current": "Chaotic Neutral"
+        "current": "Neutral"
       },
       "votes": []
     }
