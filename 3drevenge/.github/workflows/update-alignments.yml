@@ -1,0 +1,35 @@
+name: Aggiorna allineamenti
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # ogni giorno a mezzanotte UTC
+  workflow_dispatch:     # permette anche avvio manuale
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Scarica voti da Google Sheet
+        run: |
+          curl -L "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcKRqH-emR1SH5tiWdxjgKz8NkePu81-_3D6xvj6A3_fBKg7V3UehENlMc7n7MqivjoU0Yi5C0Uaxa/pub?gid=45393277&single=true&output=csv" -o votes.csv
+
+      - name: Esegui update.py
+        run: |
+          python update.py
+
+      - name: Commit e push se ci sono modifiche
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add data.json
+          git commit -m "🔄 Update alignment data (auto)" || echo "No changes to commit"
+          git push

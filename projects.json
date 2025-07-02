@@ -76,6 +76,18 @@
     "descrizione": "Environmental monitoring of Posidonia oceanica.",
     "anno": 2021,
     "periodo": "May 2020",
+<<<<<<< HEAD
+    "affiliazione": "3D Research srl; ISPRA",
+    "ruolo": "ASV Pilot",
+    "img": "img/progetto_devss2021.jpg"
+  },
+  {
+    "titolo": "SeaForest LIFE - Cilento",
+    "descrizione": "Environmental monitoring of Posidonia oceanica.",
+    "anno": 2020,
+    "periodo": "June 2020",
+=======
+>>>>>>> 5f110c069e854e515434c864294e9fd12a1b6ed3
     "affiliazione": "3D Research srl; ISPRA",
     "ruolo": "ASV Pilot",
     "img": "img/progetto_devss2021.jpg"
@@ -87,6 +99,6 @@
     "periodo": "June 2020",
     "affiliazione": "3D Research srl; ISPRA",
     "ruolo": "ASV Pilot",
-    "img": "img/progetto_devss2021.jpg"
+    "img": "https://drive.google.com/uc?export=view&id=1Y7wGjjAo6Pk9Zwy28qYjbTx8cRH8mbYi&v=1"
   }
 ]
