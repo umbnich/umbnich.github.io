@@ -2,83 +2,87 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Tabella Allineamenti</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-
-    table {
-      margin: 30px auto;
-      border-collapse: collapse;
-    }
-
-    td {
-      width: 120px;
-      height: 80px;
-      border: 1px solid #999;
-      vertical-align: middle;
-      text-align: center;
-      position: relative;
-    }
-
-    .icon {
-      position: absolute;
-      bottom: 5px;
-      right: 5px;
-      font-size: 20px;
-    }
-  </style>
-
+  <title>Login - 3DRevenge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>
-    // 🔐 Controllo accesso base
-    if (!sessionStorage.getItem("loggedIn")) {
-      alert("Accesso negato! Torna al login.");
-      window.location.href = "index.html";
-    }
-
-    // 👤 Utente loggato (simulato con sessionStorage)
-    const currentUser = sessionStorage.getItem("username");
-
-    // 🎯 Ogni utente ha una propria icona
-    const userIcons = {
-      "admin": "🛡️",
-      "mario": "⚔️",
-      "luca": "🧙",
-      "utente1": "🐉",
-      "utente2": "🧝‍♂️"
+    // Mappa utenti e password
+    const credentials = {
+      "admin": "3dpass",
+      "mario": "ciao123",
+      "luca": "pass456",
+      "utente1": "abc123",
+      "utente2": "qwerty"
     };
 
+    function login() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value;
+
+      if (credentials[user] && credentials[user] === pass) {
+        sessionStorage.setItem("loggedIn", "true");
+        sessionStorage.setItem("username", user); // ⬅️ Salva il nome utente
+        window.location.href = "pagina-protetta.html";
+      } else {
+        alert("Credenziali errate!");
+      }
+    }
+
+    // Redirect automatico se già loggato
     window.onload = function () {
-      const cell = document.getElementById("neutral-neutral");
-      if (currentUser && userIcons[currentUser]) {
-        const icon = document.createElement("div");
-        icon.className = "icon";
-        icon.textContent = userIcons[currentUser];
-        cell.appendChild(icon);
+      if (sessionStorage.getItem("loggedIn")) {
+        window.location.href = "pagina-protetta.html";
       }
     };
   </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    input {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 220px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+  </style>
 </head>
 <body>
-  <h1>Allineamenti D&D</h1>
-  <table>
-    <tr>
-      <td>Lawful Good</td>
-      <td>Neutral Good</td>
-      <td>Chaotic Good</td>
-    </tr>
-    <tr>
-      <td>Lawful Neutral</td>
-      <td id="neutral-neutral">Neutral</td>
-      <td>Chaotic Neutral</td>
-    </tr>
-    <tr>
-      <td>Lawful Evil</td>
-      <td>Neutral Evil</td>
-      <td>Chaotic Evil</td>
-    </tr>
-  </table>
+  <div class="login-container">
+    <h2>Accesso 3DRevenge</h2>
+    <input type="text" id="username" placeholder="Username" autocomplete="off">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Entra</button>
+  </div>
 </body>
 </html>
