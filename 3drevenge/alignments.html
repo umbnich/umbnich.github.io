@@ -2,15 +2,23 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Allineamenti D&D - Posizionamento Utente</title>
+  <title>3DRevenge - Alignments</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 40px;
+      padding: 20px;
+    }
+
+    .grid-section {
       text-align: center;
     }
 
     h1 {
-      margin-top: 30px;
+      margin-bottom: 20px;
     }
 
     .grid {
@@ -18,7 +26,6 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
       max-width: 600px;
-      margin: 30px auto;
     }
 
     .cell {
@@ -56,6 +63,20 @@
       top: 50%;
       transform: translate(-50%, -50%);
     }
+
+    .sidebar {
+      width: 250px;
+      font-size: 14px;
+    }
+
+    .sidebar h2 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .history-entry {
+      margin-bottom: 10px;
+    }
   </style>
 
   <script>
@@ -65,7 +86,6 @@
       window.location.href = "index.html";
     }
 
-    // Utente e icone
     const currentUser = sessionStorage.getItem("username");
 
     const userIcons = {
@@ -74,52 +94,65 @@
       "francesco.buffone": "🧙",
       "sara.serratore": "🐉",
       "umbs": "🧝‍♂️",
-      "francesca.mazzuca": "🧝‍♂️"
+      "francesca.mazzuca": "🧝‍♀️"
     };
 
-    // Mappa celle principali
-    const alignmentOrder = [
-      ["Lawful Good", "Neutral Good", "Chaotic Good"],
-      ["Lawful Neutral", "Neutral", "Chaotic Neutral"],
-      ["Lawful Evil", "Neutral Evil", "Chaotic Evil"]
-    ];
+    const userPositions = {
+      "admin": { mainRow: 1, mainCol: 1, subRow: 1, subCol: 1 },
+      "manuel.fortunato": { mainRow: 1, mainCol: 1, subRow: 1, subCol: 1 },
+      "francesco.buffone": { mainRow: 1, mainCol: 1, subRow: 1, subCol: 1 },
+      "sara.serratore": { mainRow: 1, mainCol: 1, subRow: 1, subCol: 1 },
+      "umbs": { mainRow: 1, mainCol: 1, subRow: 1, subCol: 1 },
+      "francesca.mazzuca": { mainRow: 1, mainCol: 1, subRow: 1, subCol: 1 }
+    };
 
-    // Mappa allineamenti → ID HTML
-    function generateCellId(row, col, subRow, subCol) {
-      return `cell-${row}-${col}-${subRow}-${subCol}`;
+    const previousPositions = {
+      "admin": { from: "Neutral", to: "Lawful Neutral" },
+      "manuel.fortunato": { from: "Neutral", to: "Neutral Good" },
+      "francesco.buffone": { from: "Neutral", to: "Chaotic Good" },
+      "sara.serratore": { from: "Neutral", to: "Neutral Evil" },
+      "umbs": { from: "Neutral", to: "Neutral Good" },
+      "francesca.mazzuca": { from: "Neutral", to: "Chaotic Neutral" }
+    };
+
+    function generateCellId(mainRow, mainCol, subRow, subCol) {
+      return `cell-${mainRow}-${mainCol}-${subRow}-${subCol}`;
     }
 
-    // Posizione iniziale: centro della cella "Neutral"
-    const initialPosition = {
-      mainRow: 1,
-      mainCol: 1,
-      subRow: 1,
-      subCol: 1
-    };
-
     window.onload = function () {
-      const icon = document.createElement("div");
-      icon.className = "icon";
-      icon.textContent = userIcons[currentUser] || "❓";
+      // Posiziona tutti gli utenti nella griglia
+      for (const user in userIcons) {
+        const pos = userPositions[user];
+        const icon = document.createElement("div");
+        icon.className = "icon";
+        icon.textContent = userIcons[user];
 
-      const { mainRow, mainCol, subRow, subCol } = initialPosition;
-      const cellId = generateCellId(mainRow, mainCol, subRow, subCol);
-      const target = document.getElementById(cellId);
+        const cellId = generateCellId(pos.mainRow, pos.mainCol, pos.subRow, pos.subCol);
+        const target = document.getElementById(cellId);
+        if (target) target.appendChild(icon);
+      }
 
-      if (target) {
-        target.appendChild(icon);
+      // Mostra cronologia movimenti nella sidebar
+      const historyContainer = document.getElementById("history");
+
+      for (const user in previousPositions) {
+        const { from, to } = previousPositions[user];
+        const icon = userIcons[user] || "❓";
+
+        const entry = document.createElement("div");
+        entry.className = "history-entry";
+        entry.innerText = `${icon} ${user}: ${from} → ${to}`;
+        historyContainer.appendChild(entry);
       }
     };
   </script>
 </head>
 <body>
-  <h1>Tabella Allineamenti D&D</h1>
-  <div class="grid">
-    <!-- Genera griglia 3x3 -->
-    <!-- Riga 0 -->
-    <div class="cell"><span class="label">Lawful Good</span>
-      <div class="subgrid">
-        <!-- Celle invisibili -->
+  <div class="grid-section">
+    <h1>Tabella Allineamenti D&D</h1>
+    <div class="grid">
+      <!-- Riga 0 -->
+      <div class="cell"><span class="label">Lawful Good</span><div class="subgrid">
         <div class="subcell" id="cell-0-0-0-0"></div>
         <div class="subcell" id="cell-0-0-0-1"></div>
         <div class="subcell" id="cell-0-0-0-2"></div>
@@ -129,49 +162,47 @@
         <div class="subcell" id="cell-0-0-2-0"></div>
         <div class="subcell" id="cell-0-0-2-1"></div>
         <div class="subcell" id="cell-0-0-2-2"></div>
-      </div>
-    </div>
-    <div class="cell"><span class="label">Neutral Good</span>
-      <div class="subgrid">
-        <!-- id="cell-0-1-..." -->
-        <!-- ... -->
-      </div>
-    </div>
-    <div class="cell"><span class="label">Chaotic Good</span>
-      <div class="subgrid">
-        <!-- ... -->
-      </div>
-    </div>
+      </div></div>
 
-    <!-- Riga 1 -->
-    <div class="cell"><span class="label">Lawful Neutral</span>
-      <div class="subgrid">
-        <!-- ... -->
-      </div>
-    </div>
-    <div class="cell"><span class="label">Neutral</span>
-      <div class="subgrid">
+      <div class="cell"><span class="label">Neutral Good</span><div class="subgrid">
+        <div class="subcell" id="cell-0-1-1-1"></div>
+      </div></div>
+
+      <div class="cell"><span class="label">Chaotic Good</span><div class="subgrid"></div></div>
+
+      <!-- Riga 1 -->
+      <div class="cell"><span class="label">Lawful Neutral</span><div class="subgrid">
+        <div class="subcell" id="cell-1-0-1-1"></div>
+      </div></div>
+
+      <div class="cell"><span class="label">Neutral</span><div class="subgrid">
         <div class="subcell" id="cell-1-1-0-0"></div>
         <div class="subcell" id="cell-1-1-0-1"></div>
         <div class="subcell" id="cell-1-1-0-2"></div>
         <div class="subcell" id="cell-1-1-1-0"></div>
-        <div class="subcell" id="cell-1-1-1-1"></div> <!-- ⬅️ posizione iniziale -->
+        <div class="subcell" id="cell-1-1-1-1"></div> <!-- centro -->
         <div class="subcell" id="cell-1-1-1-2"></div>
         <div class="subcell" id="cell-1-1-2-0"></div>
         <div class="subcell" id="cell-1-1-2-1"></div>
         <div class="subcell" id="cell-1-1-2-2"></div>
-      </div>
-    </div>
-    <div class="cell"><span class="label">Chaotic Neutral</span>
-      <div class="subgrid">
-        <!-- ... -->
-      </div>
-    </div>
+      </div></div>
 
-    <!-- Riga 2 -->
-    <div class="cell"><span class="label">Lawful Evil</span><div class="subgrid"></div></div>
-    <div class="cell"><span class="label">Neutral Evil</span><div class="subgrid"></div></div>
-    <div class="cell"><span class="label">Chaotic Evil</span><div class="subgrid"></div></div>
+      <div class="cell"><span class="label">Chaotic Neutral</span><div class="subgrid">
+        <div class="subcell" id="cell-1-2-1-1"></div>
+      </div></div>
+
+      <!-- Riga 2 -->
+      <div class="cell"><span class="label">Lawful Evil</span><div class="subgrid"></div></div>
+      <div class="cell"><span class="label">Neutral Evil</span><div class="subgrid">
+        <div class="subcell" id="cell-2-1-1-1"></div>
+      </div></div>
+      <div class="cell"><span class="label">Chaotic Evil</span><div class="subgrid"></div></div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <h2>Movimenti recenti</h2>
+    <div id="history"></div>
   </div>
 </body>
 </html>
