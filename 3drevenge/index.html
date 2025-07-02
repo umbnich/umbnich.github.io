@@ -4,36 +4,6 @@
   <meta charset="UTF-8">
   <title>Login - 3DRevenge</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>
-    // Mappa utenti e password
-    const credentials = {
-      "admin": "3dpass",
-      "mario": "ciao123",
-      "luca": "pass456",
-      "utente1": "abc123",
-      "utente2": "qwerty"
-    };
-
-    function login() {
-      const user = document.getElementById("username").value.trim();
-      const pass = document.getElementById("password").value;
-
-      if (credentials[user] && credentials[user] === pass) {
-        sessionStorage.setItem("loggedIn", "true");
-        sessionStorage.setItem("username", user); // ⬅️ Salva il nome utente
-        window.location.href = "alignments.html";
-      } else {
-        alert("Credenziali errate!");
-      }
-    }
-
-    // Redirect automatico se già loggato
-    window.onload = function () {
-      if (sessionStorage.getItem("loggedIn")) {
-        window.location.href = "alignment.html";
-      }
-    };
-  </script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -75,7 +45,47 @@
     button:hover {
       background-color: #005fa3;
     }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
   </style>
+
+  <script>
+    let userData = {};
+
+    // Carica dati da data.json
+    async function loadUserData() {
+      const res = await fetch('data.json');
+      const data = await res.json();
+      userData = data.users || {};
+    }
+
+    function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      const user = userData[username];
+
+      if (user && user.password === password) {
+        sessionStorage.setItem("loggedIn", "true");
+        sessionStorage.setItem("username", username);
+        window.location.href = "alignments.html";
+      } else {
+        document.getElementById("error").textContent = "Credenziali errate.";
+      }
+    }
+
+    // Se già loggato, salta al gioco
+    window.onload = async function () {
+      await loadUserData();
+
+      if (sessionStorage.getItem("loggedIn") && sessionStorage.getItem("username")) {
+        window.location.href = "alignments.html";
+      }
+    };
+  </script>
 </head>
 <body>
   <div class="login-container">
@@ -83,6 +93,7 @@
     <input type="text" id="username" placeholder="Username" autocomplete="off">
     <input type="password" id="password" placeholder="Password">
     <button onclick="login()">Entra</button>
+    <div class="error" id="error"></div>
   </div>
 </body>
 </html>
