@@ -3,103 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <title>3DRevenge - Alignments</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      gap: 40px;
-      padding: 20px;
-    }
-
-    .grid-section {
-      text-align: center;
-      flex-grow: 1;
-    }
-
-    h1 {
-      margin-bottom: 20px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      max-width: 600px;
-      margin: auto;
-    }
-
-    .cell {
-      border: 1px solid #999;
-      padding-top: 70%;
-      position: relative;
-      background-color: #f8f8f8;
-    }
-
-    .label {
-      position: absolute;
-      top: 5px;
-      left: 5px;
-      font-size: 12px;
-      color: #555;
-    }
-
     .subgrid {
-      position: absolute;
-      inset: 0;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(3, 1fr);
+      width: 100%;
+      height: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.05);
     }
 
-    .subcell {
-      border: 0;
+    .subgrid .subcell {
+      border: 1px solid rgba(255, 255, 255, 0.05);
       position: relative;
     }
-
-    .icon {
-      position: absolute;
-      font-size: 18px;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .sidebar, .voting-panel {
-      width: 250px;
-      font-size: 14px;
-    }
-
-    .sidebar h2, .voting-panel h2 {
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-
-    .history-entry {
-      margin-bottom: 10px;
-    }
-
-    .vote-box {
-      margin-bottom: 20px;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 10px;
-    }
-
-    .vote-box select,
-    .vote-box textarea {
-      width: 100%;
-      margin-top: 5px;
-      margin-bottom: 5px;
-    }
-
-    .vote-box button {
-      padding: 5px 10px;
-      font-size: 13px;
-      cursor: pointer;
-    }
   </style>
-
   <script>
     const alignments = [
       "Lawful Good", "Neutral Good", "Chaotic Good",
@@ -112,7 +33,7 @@
       if (index === -1) return null;
       const mainRow = Math.floor(index / 3);
       const mainCol = index % 3;
-      return `cell-${mainRow}-${mainCol}-1-1`;
+      return `cell-${mainRow}-${mainCol}-1-1`; // subcella centrale (1,1) in griglia 3x3
     }
 
     async function loadData() {
@@ -138,7 +59,6 @@
       const currentUser = sessionStorage.getItem("username");
       const users = await loadData();
 
-      // Posizionamento icone
       for (const user in users) {
         const alignment = users[user].position.current;
         const iconChar = users[user].icon;
@@ -149,7 +69,6 @@
         }
       }
 
-      // Colonna sinistra: movimenti
       const historyContainer = document.getElementById("history");
       for (const user in users) {
         const { icon, position } = users[user];
@@ -159,81 +78,140 @@
         historyContainer.appendChild(entry);
       }
 
-      // Colonna destra: votazione
-      const votingArea = document.getElementById("voting-area");
+      const journalContainer = document.getElementById("journal");
+      const now = new Date().toLocaleString();
       for (const user in users) {
-        if (user === currentUser) continue;
-
-        const icon = users[user].icon || "❓";
-        const container = document.createElement("div");
-        container.className = "vote-box";
-
-        const title = document.createElement("div");
-        title.innerHTML = `<strong>${icon} ${user}</strong>`;
-        container.appendChild(title);
-
-        const select = document.createElement("select");
-        alignments.forEach(alignment => {
-          const option = document.createElement("option");
-          option.value = alignment;
-          option.textContent = alignment;
-          select.appendChild(option);
-        });
-        container.appendChild(select);
-
-        const textarea = document.createElement("textarea");
-        textarea.rows = 2;
-        textarea.placeholder = "Motivazione...";
-        container.appendChild(textarea);
-
-        const button = document.createElement("button");
-        button.textContent = "Vota";
-        button.onclick = function () {
-          const voto = select.value;
-          const motivo = textarea.value;
-          console.log(`🗳️ Votazione per ${user}: ${voto}`);
-          console.log(`✏️ Motivazione: ${motivo}`);
-          alert(`Hai votato per spostare ${user} a "${voto}"\\nMotivazione: ${motivo}`);
-        };
-        container.appendChild(button);
-
-        votingArea.appendChild(container);
+        const votes = users[user].votes;
+        if (votes && votes.length > 0) {
+          votes.forEach(vote => {
+            const journalEntry = document.createElement("div");
+            journalEntry.className = "journal-entry";
+            journalEntry.innerText = `${now} - ${user} ha ricevuto un voto - motivazione: ${vote.reason}`;
+            journalContainer.appendChild(journalEntry);
+          });
+        }
       }
     };
   </script>
 </head>
 <body>
-  <!-- Colonna sinistra -->
-  <div class="sidebar">
-    <h2>Movimenti</h2>
-    <div id="history"></div>
-  </div>
-
-  <!-- Centro -->
   <div class="grid-section">
     <h1>Tabella Allineamenti D&D</h1>
     <div class="grid">
-      <!-- Griglia 3x3 -->
-      <div class="cell"><span class="label">Lawful Good</span><div class="subgrid"><div class="subcell" id="cell-0-0-1-1"></div></div></div>
-      <div class="cell"><span class="label">Neutral Good</span><div class="subgrid"><div class="subcell" id="cell-0-1-1-1"></div></div></div>
-      <div class="cell"><span class="label">Chaotic Good</span><div class="subgrid"><div class="subcell" id="cell-0-2-1-1"></div></div></div>
+      <!-- Righe 0 -->
+      <div class="cell"><span class="label">Lawful Good</span><div class="subgrid">
+        <div class="subcell" id="cell-0-0-0-0"></div>
+        <div class="subcell" id="cell-0-0-0-1"></div>
+        <div class="subcell" id="cell-0-0-0-2"></div>
+        <div class="subcell" id="cell-0-0-1-0"></div>
+        <div class="subcell" id="cell-0-0-1-1"></div>
+        <div class="subcell" id="cell-0-0-1-2"></div>
+        <div class="subcell" id="cell-0-0-2-0"></div>
+        <div class="subcell" id="cell-0-0-2-1"></div>
+        <div class="subcell" id="cell-0-0-2-2"></div>
+      </div></div>
 
-      <div class="cell"><span class="label">Lawful Neutral</span><div class="subgrid"><div class="subcell" id="cell-1-0-1-1"></div></div></div>
-      <div class="cell"><span class="label">Neutral</span><div class="subgrid"><div class="subcell" id="cell-1-1-1-1"></div></div></div>
-      <div class="cell"><span class="label">Chaotic Neutral</span><div class="subgrid"><div class="subcell" id="cell-1-2-1-1"></div></div></div>
+      <div class="cell"><span class="label">Neutral Good</span><div class="subgrid">
+        <div class="subcell" id="cell-0-1-0-0"></div>
+        <div class="subcell" id="cell-0-1-0-1"></div>
+        <div class="subcell" id="cell-0-1-0-2"></div>
+        <div class="subcell" id="cell-0-1-1-0"></div>
+        <div class="subcell" id="cell-0-1-1-1"></div>
+        <div class="subcell" id="cell-0-1-1-2"></div>
+        <div class="subcell" id="cell-0-1-2-0"></div>
+        <div class="subcell" id="cell-0-1-2-1"></div>
+        <div class="subcell" id="cell-0-1-2-2"></div>
+      </div></div>
 
-      <div class="cell"><span class="label">Lawful Evil</span><div class="subgrid"><div class="subcell" id="cell-2-0-1-1"></div></div></div>
-      <div class="cell"><span class="label">Neutral Evil</span><div class="subgrid"><div class="subcell" id="cell-2-1-1-1"></div></div></div>
-      <div class="cell"><span class="label">Chaotic Evil</span><div class="subgrid"><div class="subcell" id="cell-2-2-1-1"></div></div></div>
+      <div class="cell"><span class="label">Chaotic Good</span><div class="subgrid">
+        <div class="subcell" id="cell-0-2-0-0"></div>
+        <div class="subcell" id="cell-0-2-0-1"></div>
+        <div class="subcell" id="cell-0-2-0-2"></div>
+        <div class="subcell" id="cell-0-2-1-0"></div>
+        <div class="subcell" id="cell-0-2-1-1"></div>
+        <div class="subcell" id="cell-0-2-1-2"></div>
+        <div class="subcell" id="cell-0-2-2-0"></div>
+        <div class="subcell" id="cell-0-2-2-1"></div>
+        <div class="subcell" id="cell-0-2-2-2"></div>
+      </div></div>
+
+      <!-- Righe 1 -->
+      <div class="cell"><span class="label">Lawful Neutral</span><div class="subgrid">
+        <div class="subcell" id="cell-1-0-0-0"></div>
+        <div class="subcell" id="cell-1-0-0-1"></div>
+        <div class="subcell" id="cell-1-0-0-2"></div>
+        <div class="subcell" id="cell-1-0-1-0"></div>
+        <div class="subcell" id="cell-1-0-1-1"></div>
+        <div class="subcell" id="cell-1-0-1-2"></div>
+        <div class="subcell" id="cell-1-0-2-0"></div>
+        <div class="subcell" id="cell-1-0-2-1"></div>
+        <div class="subcell" id="cell-1-0-2-2"></div>
+      </div></div>
+
+      <div class="cell"><span class="label">Neutral</span><div class="subgrid">
+        <div class="subcell" id="cell-1-1-0-0"></div>
+        <div class="subcell" id="cell-1-1-0-1"></div>
+        <div class="subcell" id="cell-1-1-0-2"></div>
+        <div class="subcell" id="cell-1-1-1-0"></div>
+        <div class="subcell" id="cell-1-1-1-1"></div>
+        <div class="subcell" id="cell-1-1-1-2"></div>
+        <div class="subcell" id="cell-1-1-2-0"></div>
+        <div class="subcell" id="cell-1-1-2-1"></div>
+        <div class="subcell" id="cell-1-1-2-2"></div>
+      </div></div>
+
+      <div class="cell"><span class="label">Chaotic Neutral</span><div class="subgrid">
+        <div class="subcell" id="cell-1-2-0-0"></div>
+        <div class="subcell" id="cell-1-2-0-1"></div>
+        <div class="subcell" id="cell-1-2-0-2"></div>
+        <div class="subcell" id="cell-1-2-1-0"></div>
+        <div class="subcell" id="cell-1-2-1-1"></div>
+        <div class="subcell" id="cell-1-2-1-2"></div>
+        <div class="subcell" id="cell-1-2-2-0"></div>
+        <div class="subcell" id="cell-1-2-2-1"></div>
+        <div class="subcell" id="cell-1-2-2-2"></div>
+      </div></div>
+
+      <!-- Righe 2 -->
+      <div class="cell"><span class="label">Lawful Evil</span><div class="subgrid">
+        <div class="subcell" id="cell-2-0-0-0"></div>
+        <div class="subcell" id="cell-2-0-0-1"></div>
+        <div class="subcell" id="cell-2-0-0-2"></div>
+        <div class="subcell" id="cell-2-0-1-0"></div>
+        <div class="subcell" id="cell-2-0-1-1"></div>
+        <div class="subcell" id="cell-2-0-1-2"></div>
+        <div class="subcell" id="cell-2-0-2-0"></div>
+        <div class="subcell" id="cell-2-0-2-1"></div>
+        <div class="subcell" id="cell-2-0-2-2"></div>
+      </div></div>
+
+      <div class="cell"><span class="label">Neutral Evil</span><div class="subgrid">
+        <div class="subcell" id="cell-2-1-0-0"></div>
+        <div class="subcell" id="cell-2-1-0-1"></div>
+        <div class="subcell" id="cell-2-1-0-2"></div>
+        <div class="subcell" id="cell-2-1-1-0"></div>
+        <div class="subcell" id="cell-2-1-1-1"></div>
+        <div class="subcell" id="cell-2-1-1-2"></div>
+        <div class="subcell" id="cell-2-1-2-0"></div>
+        <div class="subcell" id="cell-2-1-2-1"></div>
+        <div class="subcell" id="cell-2-1-2-2"></div>
+      </div></div>
+
+      <div class="cell"><span class="label">Chaotic Evil</span><div class="subgrid">
+        <div class="subcell" id="cell-2-2-0-0"></div>
+        <div class="subcell" id="cell-2-2-0-1"></div>
+        <div class="subcell" id="cell-2-2-0-2"></div>
+        <div class="subcell" id="cell-2-2-1-0"></div>
+        <div class="subcell" id="cell-2-2-1-1"></div>
+        <div class="subcell" id="cell-2-2-1-2"></div>
+        <div class="subcell" id="cell-2-2-2-0"></div>
+        <div class="subcell" id="cell-2-2-2-1"></div>
+        <div class="subcell" id="cell-2-2-2-2"></div>
+      </div></div>
     </div>
   </div>
 
-  <!-- Colonna destra -->
-  <div class="voting-panel">
-    <h2>Vota</h2>
-    <div id="voting-area"></div>
-  </div>
-<script src="voting.js"></script>
-
+  <div id="history"></div>
+  <div id="journal"></div>
 </body>
 </html>
