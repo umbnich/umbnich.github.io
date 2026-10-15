@@ -502,6 +502,16 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;font-si
 <div id="pop" role="listbox" id="pop" hidden></div>
 
 <script>
+/* segnalatore errori: se qualcosa si rompe all'avvio lo mostra a schermo invece di lasciare la pagina vuota */
+window.__err = function (e, where) {
+  try {
+    let b = document.getElementById("errbar");
+    if (!b) { b = document.createElement("div"); b.id = "errbar"; b.setAttribute("role", "alert"); b.style.cssText = "position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#7a1f1f;color:#fff;font:12px/1.4 sans-serif;padding:8px 12px;max-height:35vh;overflow:auto"; document.body.appendChild(b); }
+    b.textContent = "Errore" + (where ? " (" + where + ")" : "") + ": " + (e && e.message ? e.message : String(e)) + (e && e.stack ? " | " + String(e.stack).split("\n").slice(0, 2).join(" ") : "");
+  } catch (x) { /* ignora */ }
+};
+window.addEventListener("error", ev => { window.__err(ev.error || ev.message, "riga " + ev.lineno); });
+window.addEventListener("unhandledrejection", ev => { window.__err(ev.reason, "promessa"); });
 
 
 
@@ -820,7 +830,7 @@ const add = (a, b) => ({ k: a.k + b.k, p: a.p + b.p, c: a.c + b.c, f: a.f + b.f 
 function mac(r) { if (!r.id) return zero(); const it = I[r.id], x = r.g / 100; return { k: it.k * x, p: it.p * x, c: it.c * x, f: it.f * x }; }
 function colTotal(m) { return m.rows.reduce((t, r) => add(t, mac(r)), zero()); }
 function clamp(v) { v = Math.round(Number(v)); return isFinite(v) ? Math.max(0, Math.min(2000, v)) : 0; }
-const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 const CKEY = "ppl-custom-v1";
 let custom = [], customN = 1;
 function registerCustom(x) {
@@ -2808,19 +2818,7 @@ function copyList(btn) {
   try { navigator.clipboard.writeText(text).then(() => done(true), () => done(false)); } catch (e) { done(false); }
 }
 
-renderTargets();
-renderCustom();
-renderTargets();
-renderGenPanel();
-renderOff();
-renderTpl();
-renderPdf();
-renderBackup();
-renderPantry();
-renderWL();
-renderDays();
-renderCols();
-refreshNums();
+[renderTargets, renderCustom, renderTargets, renderGenPanel, renderOff, renderTpl, renderPdf, renderBackup, renderPantry, renderWL, renderDays, renderCols, refreshNums].forEach(f => { try { f(); } catch (e) { window.__err(e, f.name); } });
 setTimeout(() => { offRefresh(false); }, 2500);
 try { const tb = localStorage.getItem("ppl-tab"); if (tb === "shop" || tb === "pantry" || tb === "prep" || tb === "week" || tb === "avatar") setTab(tb); } catch (e) { /* ignora */ }
 /* le schede restano sotto la barra fissa degli obiettivi: ne misuro l'altezza */
