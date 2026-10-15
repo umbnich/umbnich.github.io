@@ -110,7 +110,9 @@ h1{font-size:clamp(22px,3.2vw,30px)}
 .dial.over .dl{color:var(--f);font-weight:700}
 .dial.over .fil{stroke:var(--f)!important}
 @media (max-width:760px){.topbar{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"ttl hg" "dash dash"}.ttl{grid-area:ttl}.hgrp{grid-area:hg;margin:0;padding:0;border:0}.dash{grid-area:dash;gap:2px 4px}.dial .dv{font-size:10px}.dial .dv b{font-size:13px}.tin{width:38px;font-size:10px}.dial .dl{font-size:9px}.dial .dd{display:none}.dial.over .dd{display:inline}.hgrp .btn{padding:4px 8px}}
-.tabstrip{display:flex;gap:4px;padding:0 8px;margin-top:12px;overflow-x:auto;scrollbar-width:none;position:relative;z-index:1}
+.stick{position:sticky;top:var(--tbh,0px);z-index:39;background:var(--bg);padding-top:10px;margin-top:2px}
+.mini{display:none}
+.tabstrip{display:flex;gap:4px;padding:0 8px;margin-top:0;overflow-x:auto;scrollbar-width:none;position:relative;z-index:1}
 .tabstrip [role=tab]{flex:none;border:2px solid var(--line);border-bottom:0;border-radius:10px 10px 0 0;background:var(--soft);color:var(--muted);padding:8px 16px 7px;font-weight:700;font-size:14px;margin-bottom:-2px}
 .tabstrip [role=tab]:hover{color:var(--ink)}
 .tabstrip [role=tab][aria-selected="true"]{background:var(--surface);color:var(--ink);border-color:var(--rule);padding-bottom:9px}
@@ -310,6 +312,26 @@ h1{font-size:clamp(22px,3.2vw,30px)}
 .hint{font-size:13px;color:var(--muted)}
 .note{font-size:12px;color:var(--muted);margin:12px 0}
 footer{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;font-size:12px;color:var(--muted);max-width:90ch}
+@media (max-width:760px){
+.topbar{position:static}
+.stick{top:0;padding-top:0}
+.mini{display:block;font-size:12px;font-weight:600;padding:5px 10px;border-bottom:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabstrip{padding:6px 6px 0}
+.tabstrip [role=tab]{padding:7px 12px 6px;font-size:13px}
+.tablewrap{overflow:visible;scroll-snap-type:none;border-top:0;background:transparent}
+.cols{flex-direction:column;gap:14px}
+.col{flex:none;width:100%;max-width:none;min-width:0;border:2px solid var(--rule);background:var(--surface)}
+.newcol{flex:none;padding:0}
+.newcol .add{padding:12px 8px}
+.ch{padding:8px 10px}
+.row{padding:8px 10px;gap:5px}
+.r2{justify-content:flex-start;gap:14px}
+.rk{margin-left:auto}
+.r3{gap:2px 14px}
+.ft{padding:8px 10px 10px}
+.ft-k b{font-size:22px}
+}
+@media (max-width:430px){.dial .dv>span:last-child{display:none}.dial .dv{gap:2px}}
 </style>
 </head>
 <body>
@@ -321,13 +343,14 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;font-si
     <span class="hgrp" role="group" aria-label="Cronologia"><button type="button" class="btn sm" data-act="undo" title="Annulla l'ultima modifica (Ctrl+Z)" disabled>&#8630; Annulla</button><button type="button" class="btn sm" data-act="redo" title="Ripeti (Ctrl+Maiusc+Z)" disabled>Ripeti &#8631;</button></span>
   </header>
 
+  <div class="stick" id="stick"><div class="mini num" id="mini" aria-hidden="true"></div>
   <div class="tabstrip" role="tablist" aria-label="Pagine">
     <button type="button" role="tab" id="tb-plan" data-act="tab" data-t="plan" aria-selected="true" aria-controls="tab-plan">Pianificazione</button>
     <button type="button" role="tab" id="tb-shop" data-act="tab" data-t="shop" aria-selected="false" aria-controls="tab-shop" tabindex="-1">Lista della spesa</button>
     <button type="button" role="tab" id="tb-prep" data-act="tab" data-t="prep" aria-selected="false" aria-controls="tab-prep" tabindex="-1">Meal prep e conservazione</button>
     <button type="button" role="tab" id="tb-week" data-act="tab" data-t="week" aria-selected="false" aria-controls="tab-week" tabindex="-1">Settimana e previsione</button>
     <button type="button" role="tab" id="tb-avatar" data-act="tab" data-t="avatar" aria-selected="false" aria-controls="tab-avatar" tabindex="-1">Avatar</button>
-  </div>
+  </div></div>
   <div class="page">
 
   <div id="tab-plan" class="panel" role="tabpanel" aria-labelledby="tb-plan">
@@ -1244,6 +1267,7 @@ function renderDash() {
   if (!el) return;
   if (!el.firstChild) buildDash(el);
   const t = dayTotal(), T = state.target;
+  const mini = $("#mini"); if (mini) mini.textContent = r0(t.k) + "/" + r0(T.k) + " kcal · P " + r0(t.p) + "/" + r0(T.p) + " · C " + r0(t.c) + "/" + r0(T.c) + " · G " + r0(t.f) + "/" + r0(T.f);
   const cap = $("#dayCap"); if (cap) cap.textContent = "Giorno " + (state.cur + 1) + " · fibre ≈ " + r0(rowsFib(state.meals.flatMap(m => m.rows))) + " g (consigliati 25)";
   DIALS.forEach(x => {
     const k = x[0], v = t[k], tg = T[k], box = $("#dial_" + k);
@@ -2146,6 +2170,11 @@ renderCols();
 refreshNums();
 setTimeout(() => { offRefresh(false); }, 2500);
 try { const tb = localStorage.getItem("ppl-tab"); if (tb === "shop" || tb === "prep" || tb === "week" || tb === "avatar") setTab(tb); } catch (e) { /* ignora */ }
+/* le schede restano sotto la barra fissa degli obiettivi: ne misuro l'altezza */
+try {
+  const tb = document.querySelector(".topbar"), setH = () => document.documentElement.style.setProperty("--tbh", tb.offsetHeight + "px");
+  setH(); if (window.ResizeObserver) new ResizeObserver(setH).observe(tb); else window.addEventListener("resize", setH);
+} catch (e) { /* ignora */ }
 
 </script>
 
