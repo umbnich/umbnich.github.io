@@ -171,6 +171,17 @@ h1{font-size:clamp(22px,3.2vw,30px)}
   #pv pre{white-space:pre-wrap;font:11px/1.45 Arial,Helvetica,sans-serif;margin:0}
   #pv .fine{margin-top:14px;color:#555;font-size:10px}
 }
+.av-fig{transform-box:view-box;transform-origin:100px 205px;animation:avbreath 3.6s ease-in-out infinite}
+.av-bob{transform-box:view-box;transform-origin:100px 100px;animation:avbob 4.4s ease-in-out infinite}
+.av-eyes{transform-box:view-box;transform-origin:100px 68px;animation:avblink 5.2s infinite}
+.avc:nth-child(2) .av-fig{animation-delay:-1.4s}.avc:nth-child(2) .av-bob{animation-delay:-2.1s}.avc:nth-child(2) .av-eyes{animation-delay:-2.6s}
+@keyframes avbreath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.01,1.016)}}
+@keyframes avbob{0%,100%{transform:rotate(-2.4deg)}50%{transform:rotate(2.4deg) translateY(-1px)}}
+@keyframes avblink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+.avc{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.avc.hop svg{animation:avhop .65s cubic-bezier(.3,.7,.4,1)}
+@keyframes avhop{0%{transform:translateY(0) scale(1,1)}20%{transform:translateY(0) scale(1.06,.93)}50%{transform:translateY(-16px) scale(.97,1.04)}80%{transform:translateY(0) scale(1.05,.94)}100%{transform:translateY(0) scale(1,1)}}
+@media (prefers-reduced-motion:reduce){.av-fig,.av-bob,.av-eyes,.avc.hop svg{animation:none}}
 .ft-fb{font-size:11px;color:var(--muted);margin-top:4px}
 .wkbox{margin:0 0 18px;border-top:6px solid var(--rule);background:var(--surface);padding:12px 14px 16px}
 .wkbox h2{font-family:var(--font-display);font-stretch:125%;font-weight:850;text-transform:uppercase;font-size:22px;margin:0 0 4px;line-height:1}
@@ -758,6 +769,11 @@ function setTab(t, focus) {
   });
   try { localStorage.setItem("ppl-tab", t); } catch (e) { /* ignora */ }
 }
+document.addEventListener("click", ev => {
+  const c = ev.target.closest && ev.target.closest(".avc");
+  if (!c || c.classList.contains("hop")) return;
+  c.classList.add("hop"); setTimeout(() => c.classList.remove("hop"), 700);
+});
 document.addEventListener("keydown", ev => {
   const tb = ev.target.closest && ev.target.closest('[role="tab"]');
   if (!tb) return;
@@ -1122,13 +1138,14 @@ function avFig(sex, bmi, tone, label, cap, mod) {
     [-1, 1].forEach(k => { q += '<ellipse cx="' + (cx + k * (lx + 4)).toFixed(1) + '" cy="' + (ly + 2) + '" rx="' + (lw / 2 + 6).toFixed(1) + '" ry="5.5"/><circle cx="' + (cx + k * hx).toFixed(1) + '" cy="' + (wy + 21) + '" r="' + (aw / 2 + 1.5).toFixed(1) + '"/>'; });
     return q + '<path stroke-linejoin="round" d="' + torso + '"/></g>';
   };
+  g += '<g class="av-fig">';
   const P = (x, y) => (cx + x) + ' ' + y;
   let bk = '';
   if (f) bk += '<path fill="var(--ink)" d="M' + P(-hw - 5, 52) + ' Q' + P(-hw - 14, 92) + ' ' + P(-hw - 2, 126) + ' Q' + P(-hw + 10, 138) + ' ' + P(-hw + 22, 116) + ' L' + P(hw - 22, 116) + ' Q' + P(hw - 10, 138) + ' ' + P(hw + 2, 126) + ' Q' + P(hw + 14, 92) + ' ' + P(hw + 5, 52) + ' Z"/>';
   if (f) g += '<g transform="rotate(-4 100 100)">' + bk + '</g>';
   g += body(true, 5) + body(false, 0);
   /* testa generica */
-  let hd = '<g transform="rotate(-4 100 100)">';
+  let hd = '<g transform="rotate(-4 100 100)"><g class="av-bob">';
   hd += '<rect class="avs" stroke-width="2.8" style="fill:var(--bg)" x="' + (cx - hw).toFixed(1) + '" y="22" width="' + (hw * 2).toFixed(1) + '" height="' + (74 + s * 3).toFixed(1) + '" rx="34" ry="34"/>';
   if (f) {
     hd += '<path fill="var(--ink)" d="M' + P(-hw - 3, 70) + ' Q' + P(-hw - 6, 18) + ' ' + P(-6, 12) + ' Q' + P(hw + 8, 14) + ' ' + P(hw + 3, 70) + ' Q' + P(hw - 3, 50) + ' ' + P(hw - 12, 42) + ' Q' + P(8, 52) + ' ' + P(-12, 42) + ' Q' + P(-hw + 8, 50) + ' ' + P(-hw + 6, 68) + ' Q' + P(-hw + 2, 72) + ' ' + P(-hw - 3, 70) + ' Z"/>';
@@ -1138,10 +1155,11 @@ function avFig(sex, bmi, tone, label, cap, mod) {
     hd += '<g fill="none" stroke="var(--bg)" stroke-width="2" stroke-linecap="round"><path d="M' + P(-22, 20) + ' Q' + P(-8, 12) + ' ' + P(8, 14) + '"/><path d="M' + P(-12, 28) + ' Q' + P(4, 20) + ' ' + P(24, 22) + '"/><path d="M' + P(-26, 36) + ' Q' + P(-6, 28) + ' ' + P(10, 32) + '"/><path d="M' + P(18, 12) + ' Q' + P(32, 18) + ' ' + P(36, 32) + '"/></g>';
   }
   const eye = k => '<circle cx="' + (cx + k * 16) + '" cy="68" r="7" fill="var(--ink)"/><circle cx="' + (cx + k * 16 + 2.2) + '" cy="65.5" r="2.2" style="fill:var(--bg)"/>';
-  hd += eye(-1) + eye(1);
+  hd += '<g class="av-eyes">' + eye(-1) + eye(1) + '</g>';
   if (f) hd += '<g class="avs" stroke-width="2.2"><path d="M' + P(-24, 66) + ' l-4 1 M' + P(24, 66) + ' l4 1"/></g>';
-  hd += '<ellipse cx="' + (cx - 27) + '" cy="82" rx="6" ry="3.6" style="fill:var(--line)"/><ellipse cx="' + (cx + 27) + '" cy="82" rx="6" ry="3.6" style="fill:var(--line)"/></g>';
+  hd += '<ellipse cx="' + (cx - 27) + '" cy="82" rx="6" ry="3.6" style="fill:var(--line)"/><ellipse cx="' + (cx + 27) + '" cy="82" rx="6" ry="3.6" style="fill:var(--line)"/></g></g>';
   g += hd;
+  g += '</g>';
   if (cap) g += '<text x="100" y="232" text-anchor="middle" style="fill:var(--ink);font:600 9px var(--font-num);letter-spacing:.12em">' + cap + '</text>';
   return '<svg viewBox="0 0 200 244" role="img" aria-label="' + label + '">' + g + '</svg>';
 }
