@@ -136,6 +136,41 @@ h1{font-size:clamp(22px,3.2vw,30px)}
 .avsw button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .avs{stroke:var(--ink);fill:none;stroke-linecap:round;stroke-linejoin:round}
 .avf{fill:var(--soft)}
+.x.fit{width:auto;min-width:30px;padding:0 4px;font-size:10px;font-weight:700;letter-spacing:.02em}
+.ch .x{width:26px;height:26px}.ch .x.fit{width:auto;min-width:34px}.ch{gap:4px}.nm{font-size:16px;padding:0 4px}
+.fitbar{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;padding:7px 10px;background:var(--soft);border-bottom:1px solid var(--line);font-size:12px}
+.fitbar .fl{flex:1 0 100%;color:var(--muted)}
+.fitbar select,.fitbar input{font:inherit;font-size:13px;height:28px;border:1.5px solid var(--ink);background:var(--surface);color:var(--ink);border-radius:0;padding:0 6px;min-width:0}
+.fitbar input{width:78px;font-family:var(--font-num)}
+.fitbar .fm{flex:1 0 100%;font-weight:600}
+#pv{display:none}
+.pdbody label{display:flex;gap:8px;align-items:center;margin:6px 0;font-size:14px}
+.pdbody select{font:inherit;height:30px;border:1.5px solid var(--ink);background:var(--surface);color:var(--ink);border-radius:0}
+@page{margin:13mm}
+@media print{
+  html,body{background:#fff!important;color:#000!important;padding:0!important;margin:0!important}
+  .wrap,#pop{display:none!important}
+  #pv{display:block!important;font:11.5px/1.4 Arial,Helvetica,sans-serif;color:#000;background:#fff}
+  #pv h1{font-size:22px;margin:0 0 2px}
+  #pv h2{font-size:16px;margin:0 0 6px;border-bottom:2px solid #000;padding-bottom:3px}
+  #pv h3{font-size:12.5px;margin:10px 0 3px;text-transform:uppercase;letter-spacing:.05em}
+  #pv .sub{color:#444;margin:0 0 10px}
+  #pv .sec{break-before:page}
+  #pv .sec.first{break-before:auto}
+  #pv .meal{break-inside:avoid;margin-bottom:8px}
+  #pv table{width:100%;border-collapse:collapse;table-layout:fixed}
+  #pv th:first-child{width:40%}
+  #pv th{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;text-align:right;border-bottom:1px solid #000;padding:2px 4px}
+  #pv td{text-align:right;padding:3px 4px;border-bottom:1px solid #ccc}
+  #pv th:first-child,#pv td:first-child{text-align:left}
+  #pv tr.t td{font-weight:700;border-top:1.5px solid #000;border-bottom:0}
+  #pv .dtot{margin:6px 0 0;font-weight:700}
+  #pv ul{list-style:none;margin:0 0 8px;padding:0;columns:2;column-gap:24px}
+  #pv li{break-inside:avoid;padding:2px 0;border-bottom:1px solid #ddd}
+  #pv li .qq{float:right;font-weight:700}
+  #pv pre{white-space:pre-wrap;font:11px/1.45 Arial,Helvetica,sans-serif;margin:0}
+  #pv .fine{margin-top:14px;color:#555;font-size:10px}
+}
 .ft-fb{font-size:11px;color:var(--muted);margin-top:4px}
 .wkbox{margin:0 0 18px;border-top:6px solid var(--rule);background:var(--surface);padding:12px 14px 16px}
 .wkbox h2{font-family:var(--font-display);font-stretch:125%;font-weight:850;text-transform:uppercase;font-size:22px;margin:0 0 4px;line-height:1}
@@ -381,6 +416,8 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;font-si
 
     <details class="genp" id="tpd"></details>
 
+    <details class="genp" id="pdd"></details>
+
     <details class="genp" id="dbd"></details>
 
     <details class="genp" id="bkd"></details>
@@ -421,6 +458,7 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;font-si
     Prodotti Milbona e di supermercato: valori per 100 g da FatSecret Italia e schede prodotto. Dove è indicato "macro stimati" le kcal sono verificate ma i macro sono approssimati; le voci generiche usano tabelle nutrizionali standard. Pesi a crudo e al netto degli scarti come nel piano. Gli alimenti "affine" non sono nel piano. Nomi e formati dei prodotti sono indicativi: l'assortimento cambia, controlla l'etichetta in negozio. Il piano originale era valido 2 mesi dal 27/09/2024: per l'aggiornamento rivolgiti al tuo nutrizionista.
   </footer>
 </div>
+<div id="pv" aria-hidden="true"></div>
 <div id="pop" role="listbox" id="pop" hidden></div>
 
 <script>
@@ -1146,6 +1184,63 @@ function renderAvatar() {
     note.map(n => '<p class="wlnote">' + esc(n) + '</p>').join("") + '<p class="wlnote">È una rappresentazione indicativa e stilizzata, non una misura del corpo reale: la forma dipende da molti fattori oltre al peso.</p>';
 }
 
+/* ---------- PDF: vista di stampa (si salva come PDF dalla finestra di stampa) ---------- */
+function renderPdf() {
+  const el = $("#pdd");
+  if (!el) return;
+  el.innerHTML = '<summary>Esporta in PDF</summary><div class="dbbody pdbody"><p class="hint">Crea un documento con i pasti, la lista della spesa e il meal prep. Si apre la finestra di stampa: scegli “Salva come PDF”.</p>' +
+    '<label><input type="checkbox" id="pd_plan" checked> Piano dei pasti</label>' +
+    '<label>Giorni <select id="pd_days"><option value="all">tutti i giorni</option><option value="cur">solo il giorno corrente</option></select></label>' +
+    '<label><input type="checkbox" id="pd_shop" checked> Lista della spesa</label>' +
+    '<label><input type="checkbox" id="pd_prep"> Programma di meal prep</label>' +
+    '<div class="dbq"><button type="button" class="btn pri" data-act="pdfmake">Crea PDF</button></div><div class="dbstat" id="pd_msg" role="status"></div></div>';
+}
+function pvHtml(o) {
+  const T = state.target, today = new Date().toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" });
+  let s = '<h1>Piano Pasti</h1><p class="sub">' + today + ' · obiettivi giornalieri: ' + r0(T.k) + ' kcal · proteine ' + r0(T.p) + ' g · carboidrati ' + r0(T.c) + ' g · grassi ' + r0(T.f) + ' g</p>';
+  let first = true;
+  if (o.plan) {
+    const idx = o.cur ? [state.cur] : state.plan.map((d, i) => i);
+    idx.forEach(di => {
+      const day = state.plan[di], tot = dayTot(day);
+      s += '<div class="sec' + (first ? " first" : "") + '"><h2>Giorno ' + (di + 1) + ' · ' + r0(tot.k) + ' kcal</h2>'; first = false;
+      day.forEach(m => {
+        const rows = m.rows.filter(r => r.id && I[r.id] && r.g > 0), t = colTotal(m);
+        if (!rows.length) return;
+        s += '<div class="meal"><h3>' + esc(m.name) + '</h3><table><thead><tr><th>Alimento</th><th>Quantità</th><th>kcal</th><th>Prot.</th><th>Carb.</th><th>Grassi</th></tr></thead><tbody>' +
+          rows.map(r => { const it = I[r.id], n = mac(r); return '<tr><td>' + esc(it.name) + '</td><td>' + qtyText(it, r.g) + '</td><td>' + r0(n.k) + '</td><td>' + r1(n.p) + '</td><td>' + r1(n.c) + '</td><td>' + r1(n.f) + '</td></tr>'; }).join("") +
+          '<tr class="t"><td>Totale</td><td></td><td>' + r0(t.k) + '</td><td>' + r1(t.p) + '</td><td>' + r1(t.c) + '</td><td>' + r1(t.f) + '</td></tr></tbody></table></div>';
+      });
+      s += '<p class="dtot">Totale del giorno: ' + r0(tot.k) + ' kcal · proteine ' + r1(tot.p) + ' g · carboidrati ' + r1(tot.c) + ' g · grassi ' + r1(tot.f) + ' g · fibre ≈ ' + r0(rowsFib(day.flatMap(m => m.rows))) + ' g</p></div>';
+    });
+  }
+  if (o.shop) {
+    const secs = shopping();
+    s += '<div class="sec' + (first ? " first" : "") + '"><h2>Lista della spesa (' + state.plan.length + (state.plan.length === 1 ? " giorno" : " giorni") + ')</h2>'; first = false;
+    SEC_ORDER.forEach(sc => {
+      if (!secs[sc]) return;
+      s += '<h3>' + esc(sc) + '</h3><ul>' + secs[sc].map(v => {
+        const l = v.lidl, q = l.pack ? "× " + Math.ceil(v.need / l.pack - 0.001) : (l.u === "uova" ? "" : "≈ " + r0(v.need) + " g");
+        return '<li>' + (BOUGHT.has(l.n) ? "☑" : "☐") + " " + esc(l.n) + '<span class="qq">' + q + '</span></li>';
+      }).join("") + '</ul>';
+    });
+    s += '</div>';
+  }
+  if (o.prep) {
+    s += '<div class="sec' + (first ? " first" : "") + '"><h2>Meal prep e conservazione</h2><pre>' + esc(prepText()) + '</pre></div>'; first = false;
+  }
+  return s + '<p class="fine">Valori indicativi calcolati da Piano Pasti. Non sostituisce le indicazioni del tuo nutrizionista.</p>';
+}
+function makePdf() {
+  const g = id => { const e = $("#" + id); return e && (e.type === "checkbox" ? e.checked : e.value); };
+  const o = { plan: g("pd_plan"), shop: g("pd_shop"), prep: g("pd_prep"), cur: g("pd_days") === "cur" };
+  const msg = t => { const e = $("#pd_msg"); if (e) e.textContent = t; };
+  if (!o.plan && !o.shop && !o.prep) { msg("Scegli almeno una sezione."); return; }
+  $("#pv").innerHTML = pvHtml(o);
+  msg("Si apre la finestra di stampa: scegli “Salva come PDF”.");
+  try { setTimeout(() => { try { window.print(); } catch (e) { msg("La stampa non è disponibile in questo ambiente: apri la pagina nel browser e riprova."); } }, 150); } catch (e) { msg("La stampa non è disponibile in questo ambiente."); }
+}
+
 const ALL = Object.keys(I).map(k => I[k]);
 ALL.forEach(it => { it.nq = norm(it.name + " " + it.cat + " " + it.lidl.n); });
 state.plan.forEach(day => day.forEach(m => { m.rows = m.rows.filter(r => r.id === null || I[r.id]); }));
@@ -1222,11 +1317,50 @@ function altFood(m, i) {
 }
 /* colori opposti sulla ruota (rosso/verde, viola/giallo) per pasti consecutivi */
 function mealKind(m, i) { return (i % 4) + 1; }
+let FIT = null;
+function fitDefault(m, key) {
+  const cur = colTotal(m)[key], day = dayTotal(), T = state.target;
+  return Math.max(key === "k" ? 50 : 5, Math.round(cur + (T[key] - day[key])));
+}
+function fitHtml(m) {
+  if (!FIT || FIT.id !== m.id) return "";
+  const cur = colTotal(m), key = FIT.key, T = state.target, day = dayTotal();
+  return '<div class="fitbar"><div class="fl">Ora ' + r0(cur.k) + ' kcal · P ' + r1(cur.p) + ' g. Per arrivare all\'obiettivo del giorno: ' + fitDefault(m, key) + (key === "k" ? " kcal" : " g di proteine") + '.</div>' +
+    '<span>Porta a</span><input id="fv_' + m.id + '" type="number" inputmode="numeric" min="0" max="5000" value="' + FIT.val + '" aria-label="Valore obiettivo del pasto"><select id="fk_' + m.id + '" data-act="fitmode" data-col="' + m.id + '" aria-label="Unità"><option value="k"' + (key === "k" ? " selected" : "") + '>kcal</option><option value="p"' + (key === "p" ? " selected" : "") + '>g proteine</option></select>' +
+    '<button type="button" class="btn sm pri" data-act="fitapply" data-col="' + m.id + '">Adatta</button><button type="button" class="btn sm" data-act="fitcancel">Annulla</button>' +
+    (FIT.msg ? '<div class="fm" role="status">' + esc(FIT.msg) + '</div>' : '') + '</div>';
+}
+function fitMeal(m, key, target) {
+  const rows = m.rows.filter(r => r.id && I[r.id] && r.g > 0 && !I[r.id].free);
+  const cur = colTotal(m)[key];
+  if (!rows.length || cur <= 0) return "Il pasto non ha alimenti con valori da adattare.";
+  let f = target / cur, note = "";
+  if (f > 3) { f = 3; note = " (limitato a 3 volte le quantità attuali)"; }
+  if (f < 0.3) { f = 0.3; note = " (limitato al 30% delle quantità attuali)"; }
+  const step = r => I[r.id].units ? 1 / I[r.id].units : 5;
+  const snap = (r, g) => { const s = step(r); return Math.max(s, Math.round(g / s) * s); };
+  const val = () => colTotal(m)[key];
+  rows.forEach(r => { r.g = Math.min(2000, snap(r, r.g * f)); });
+  for (let i = 0; i < 12; i++) {
+    const diff = target - val();
+    let best = null, bd = Math.abs(diff);
+    rows.forEach(r => [-1, 1].forEach(sg => {
+      const old = r.g, ng = Math.min(2000, Math.max(step(r), old + sg * step(r)));
+      if (ng === old) return;
+      r.g = ng; const nd = Math.abs(target - val()); r.g = old;
+      if (nd < bd - 0.01) { bd = nd; best = [r, ng]; }
+    }));
+    if (!best) break;
+    best[0].g = best[1];
+  }
+  return "Fatto: ora " + r0(colTotal(m).k) + " kcal, " + r1(colTotal(m).p) + " g di proteine" + note + ".";
+}
 function renderCols() {
   $("#cols").innerHTML = state.meals.map((m, mi) =>
     '<section class="col" data-mk="' + mealKind(m, mi) + '" aria-label="' + esc(m.name) + '"><div class="ch"><input id="nm_' + m.id + '" class="nm" type="text" maxlength="40" value="' + esc(m.name) + '" data-act="name" data-col="' + m.id + '" aria-label="Nome del pasto">' +
-    '<button type="button" class="x st" data-act="savetpl" data-col="' + m.id + '" title="Salva questo pasto tra i preferiti" aria-label="Salva il pasto ' + esc(m.name) + ' tra i preferiti">&#9733;</button>' +
-    '<button type="button" class="x" data-act="delmeal" data-col="' + m.id + '" aria-label="Rimuovi pasto ' + esc(m.name) + '">&times;</button></div>' +
+    '<button type="button" class="x fit" data-act="fit" data-col="' + m.id + '" title="Adatta le quantità a un obiettivo di calorie o proteine" aria-label="Adatta alle calorie il pasto ' + esc(m.name) + '">kcal</button>' +
+    '<button type="button" class="x st" data-act="savetpl" data-col="' + m.id + '" title=""Salva questo pasto tra i preferiti" aria-label="Salva il pasto ' + esc(m.name) + ' tra i preferiti">&#9733;</button>' +
+    '<button type="button" class="x" data-act="delmeal" data-col="' + m.id + '" aria-label="Rimuovi pasto ' + esc(m.name) + '">&times;</button></div>' + fitHtml(m) +
     '<div class="rows">' + (m.rows.length ? m.rows.map((r, i) => rowHtml(m, i, r)).join("") : '<div class="empty">Nessun alimento. Aggiungi una riga.</div>') +
     '<button type="button" class="add" data-act="add" data-col="' + m.id + '">+ Aggiungi alimento</button></div>' +
     '<div class="ft" id="ft_' + m.id + '">' + footHtml(m) + '</div></section>').join("") + '<div id="sugg" class="suggwrap"></div><div id="integ" class="suggwrap"></div>' +
@@ -1896,6 +2030,7 @@ document.addEventListener("input", ev => {
   }
 });
 document.addEventListener("keydown", ev => {
+  if (ev.key === "Enter" && ev.target && /^fv_/.test(ev.target.id || "")) { ev.preventDefault(); const b = document.querySelector("[data-act=fitapply]"); if (b) b.click(); return; }
   if (ev.key === "Enter" && ev.target && ev.target.id === "off_q") { ev.preventDefault(); OFF.q = ev.target.value; offSearch(); return; }
   if ((ev.ctrlKey || ev.metaKey) && !ev.altKey && (ev.key === "z" || ev.key === "Z" || ev.key === "y" || ev.key === "Y")) {
     const t = ev.target, tag = t && t.tagName;
@@ -1965,6 +2100,14 @@ document.addEventListener("click", ev => {
   } else if (act === "offadd") { offAdd(el.dataset.code);
   } else if (act === "offdel") { offDelete(el.dataset.code);
   } else if (act === "offclear") { offClear();
+  } else if (act === "fit") {
+    const m = meal(el.dataset.col);
+    if (m) { closePop(false); if (FIT && FIT.id === m.id) FIT = null; else FIT = { id: m.id, key: "k", val: fitDefault(m, "k"), msg: "" }; renderCols(); const i = $("#fv_" + el.dataset.col); if (i) i.focus(); }
+  } else if (act === "fitcancel") { FIT = null; renderCols();
+  } else if (act === "fitapply") {
+    const m = meal(el.dataset.col), v = Number(($("#fv_" + el.dataset.col) || {}).value);
+    if (m && isFinite(v) && v > 0) { const msg = fitMeal(m, FIT ? FIT.key : "k", v); FIT = { id: m.id, key: FIT ? FIT.key : "k", val: v, msg: msg }; renderCols(); refreshNums(); }
+  } else if (act === "pdfmake") { makePdf();
   } else if (act === "savetpl") {
     const m = meal(el.dataset.col);
     if (m) {
@@ -2127,6 +2270,7 @@ document.addEventListener("change", ev => {
     if (el.checked) BOUGHT.add(n); else BOUGHT.delete(n);
     boughtSave(); const li = el.closest(".li"); if (li) li.classList.toggle("done", el.checked); return;
   }
+  if (a === "fitmode") { const m = meal(el.dataset.col); if (m && FIT) { FIT.key = el.value; FIT.val = fitDefault(m, FIT.key); FIT.msg = ""; renderCols(); } return; }
   if (a === "wp") { wpSet(el); return; }
   if (a === "gsupp") { state.pref.nosupp = el.checked; state.gen = null; doGen(); renderGenPanel(); save(); }
   else if (a === "pref") { const k = el.dataset.k; if (k in state.pref) { state.pref[k] = el.checked; state.gen = null; renderSugg(); save(); } }
@@ -2194,6 +2338,7 @@ renderTargets();
 renderGenPanel();
 renderOff();
 renderTpl();
+renderPdf();
 renderBackup();
 renderWL();
 renderDays();
