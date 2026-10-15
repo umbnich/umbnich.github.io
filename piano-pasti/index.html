@@ -303,11 +303,15 @@ h1{font-size:clamp(22px,3.2vw,30px)}
 .secs{columns:2 300px;column-gap:28px}
 .sec{margin-top:12px;break-inside:avoid}
 .sec h4{margin:0 0 4px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:7px 0;border-top:1px solid var(--line)}
+.li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 10px;padding:7px 0;border-top:1px solid var(--line);align-items:start}
+.li .bk{grid-row:1 / 3;width:22px;height:22px;margin:1px 0 0;accent-color:var(--ink);cursor:pointer}
+.li .d{grid-column:2 / -1}
+.li.done .n,.li.done .q,.li.done .d{text-decoration:line-through;color:var(--muted)}
+.li.done .q b{background:var(--line);color:var(--muted)}
 .li .n{font-weight:600;overflow-wrap:anywhere}
 .li .q{font-family:var(--font-num);font-size:13px;text-align:right;white-space:nowrap}
 .li .q b{background:var(--sel-bg);color:var(--sel-ink);padding:1px 7px;margin-right:6px}
-.li .d{grid-column:1 / -1;font-size:12px;color:var(--muted)}
+.li .d{font-size:12px;color:var(--muted)}
 .lf{display:inline-block;font-size:11px;font-weight:700;background:var(--warn-bg);color:var(--warn-ink);padding:1px 6px;margin-left:6px;vertical-align:1px}
 .hint{font-size:13px;color:var(--muted)}
 .note{font-size:12px;color:var(--muted);margin:12px 0}
@@ -894,7 +898,7 @@ function renderTpl() {
 const PKEY = "ppl-profile-v1";
 function backupObject() {
   const g = k => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
-  return { app: "piano-pasti", v: 1, saved: new Date().toISOString(), menu: g(KEY), custom: g(CKEY), off: g(OKEY), tpl: g(TKEY), profile: g(PKEY), tab: null };
+  return { app: "piano-pasti", v: 1, saved: new Date().toISOString(), menu: g(KEY), custom: g(CKEY), off: g(OKEY), tpl: g(TKEY), profile: g(PKEY), bought: g(BKEY) };
 }
 function renderBackup() {
   const el = $("#bkd");
@@ -915,6 +919,7 @@ function bkImport() {
     if (o.off && o.off.v === 1) put(OKEY, o.off);
     if (Array.isArray(o.tpl)) put(TKEY, o.tpl);
     if (o.profile && typeof o.profile === "object") put(PKEY, o.profile);
+    if (Array.isArray(o.bought)) put(BKEY, o.bought);
   } catch (e) { bkMsg("Impossibile scrivere i dati in questo browser."); return; }
   bkMsg("Backup importato: ricarico la pagina…");
   setTimeout(() => location.reload(), 600);
@@ -1245,6 +1250,10 @@ function refreshNums() {
 
 /* Lista spesa e valori del giorno */
 const SEC_ORDER = ["Frigo e latticini", "Carne, pesce e salumi", "Dispensa", "Pane e colazione", "Ortofrutta", "Altro"];
+const BKEY = "ppl-bought-v1";
+let BOUGHT = new Set();
+try { const b = JSON.parse(localStorage.getItem(BKEY)); if (Array.isArray(b)) BOUGHT = new Set(b.filter(x => typeof x === "string").slice(0, 500)); } catch (e) { /* nessun salvataggio */ }
+const boughtSave = () => { try { localStorage.setItem(BKEY, JSON.stringify([...BOUGHT])); } catch (e) { /* ignora */ } };
 function shopping() {
   const map = new Map();
   state.plan.forEach(day => day.forEach(m => m.rows.forEach(r => {
@@ -1319,14 +1328,15 @@ function renderBelow() {
       if (l.pack) q = '<b>&times; ' + Math.ceil(v.need / l.pack - 0.001) + '</b>' + (l.u === "uova" ? "conf. da " + l.pack : l.pack + " g");
       else if (l.u !== "uova") q = "≈ " + r0(v.need) + " g";
       const need = l.u === "uova" ? "servono " + Math.ceil(v.need - 0.001) + " uova" : "servono " + r0(v.need) + " g";
-      h += '<div class="li"><div class="n">' + l.n + (l.lf ? '<span class="lf">senza lattosio</span>' : "") + '</div><div class="q">' + q + '</div><div class="d">' + need + " · " + v.items.join(", ") + '</div></div>';
+      const dn = BOUGHT.has(l.n);
+      h += '<div class="li' + (dn ? ' done' : '') + '"><input type="checkbox" class="bk" data-act="bought" data-n="' + esc(l.n) + '" aria-label="Comprato: ' + esc(l.n) + '"' + (dn ? ' checked' : '') + '><div class="n">' + l.n + (l.lf ? '<span class="lf">senza lattosio</span>' : "") + '</div><div class="q">' + q + '</div><div class="d">' + need + " · " + v.items.join(", ") + '</div></div>';
     });
     h += '</div>';
   });
   h += '</div>';
   if (!Object.keys(secs).length) h += '<p class="hint">Aggiungi alimenti ai pasti per vedere cosa comprare.</p>';
   h += '<p class="note">Il numero accanto al prodotto indica le confezioni da prendere, arrotondate per eccesso sul formato indicato. Frutta e verdura sono a peso.</p>' +
-    '<button type="button" class="btn" data-act="copy" id="copyBtn">Copia la lista</button></div>';
+    '<button type="button" class="btn" data-act="copy" id="copyBtn">Copia la lista</button> <button type="button" class="btn" data-act="boughtclear">Azzera le spunte</button></div>';
   $("#shop").innerHTML = h;
 }
 
@@ -2096,7 +2106,8 @@ document.addEventListener("click", ev => {
     closePop(false);
     state.meals = exampleMeals();
     renderCols(); refreshNums();
-  } else if (act === "copy") { copyList(el); }
+  } else if (act === "copy") { copyList(el);
+  } else if (act === "boughtclear") { BOUGHT.clear(); boughtSave(); renderBelow(); }
 });
 document.addEventListener("change", ev => {
   const el = ev.target, a = el.dataset && el.dataset.act;
@@ -2104,6 +2115,11 @@ document.addEventListener("change", ev => {
     const fr = new FileReader(); fr.onload = () => { $("#bk_txt").value = String(fr.result).slice(0, 2000000); bkMsg("File caricato: premi Importa per ripristinare."); }; fr.readAsText(el.files[0]); return;
   }
   if (!a) return;
+  if (a === "bought") {
+    const n = el.dataset.n;
+    if (el.checked) BOUGHT.add(n); else BOUGHT.delete(n);
+    boughtSave(); const li = el.closest(".li"); if (li) li.classList.toggle("done", el.checked); return;
+  }
   if (a === "wp") { wpSet(el); return; }
   if (a === "gsupp") { state.pref.nosupp = el.checked; state.gen = null; doGen(); renderGenPanel(); save(); }
   else if (a === "pref") { const k = el.dataset.k; if (k in state.pref) { state.pref[k] = el.checked; state.gen = null; renderSugg(); save(); } }
@@ -2130,6 +2146,7 @@ function listText() {
     t += "\n" + s.toUpperCase() + "\n";
     secs[s].forEach(v => {
       const l = v.lidl;
+      if (BOUGHT.has(l.n)) return;
       t += "- " + l.n + (l.pack ? " x " + Math.ceil(v.need / l.pack - 0.001) : (l.u === "uova" ? "" : " (≈ " + r0(v.need) + " g)")) + "\n";
     });
   });
