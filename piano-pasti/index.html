@@ -413,6 +413,7 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;font-si
 .rcp summary{cursor:pointer;list-style:none}.rcp summary::-webkit-details-marker{display:none}
 .rcpm{font-size:13px;font-weight:700;margin-top:2px}.rcpm.ok{color:var(--c2)}.rcpm.no{color:var(--accent)}
 .rcpb{margin-top:6px;font-size:14px}.rcpb p{margin:4px 0}
+.rcpadd{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}.rcpadd select{font:inherit;font-size:13px;padding:5px 8px;border:1.5px solid var(--rule);background:var(--bg);color:var(--ink);min-width:0}
 </style>
 
 <div class="wrap">
@@ -1307,15 +1308,15 @@ function wdSync() { if (WD.length) { WP.w = WD[WD.length - 1].w; wpSave(); } }
 
 /* ---------- Dispensa: ricette possibili con gli alimenti che hai ---------- */
 const PTKEY = "ppl-pantry-v1";
-let PANTRY = [], PTMAX = 2;
-try { const a = JSON.parse(localStorage.getItem(PTKEY)); if (a && Array.isArray(a.i)) { PANTRY = a.i.filter(x => typeof x === "string").map(x => x.slice(0, 50)).slice(0, 100); if (isFinite(a.m)) PTMAX = Math.max(0, Math.min(4, Math.round(a.m))); } } catch (e) { /* nessun salvataggio */ }
-const ptSave = () => { try { localStorage.setItem(PTKEY, JSON.stringify({ i: PANTRY, m: PTMAX })); } catch (e) { /* ignora */ } };
+let PANTRY = [], PTMAX = 2, PTSORT = "m";
+try { const a = JSON.parse(localStorage.getItem(PTKEY)); if (a && Array.isArray(a.i)) { PANTRY = a.i.filter(x => typeof x === "string").map(x => x.slice(0, 50)).slice(0, 100); if (isFinite(a.m)) PTMAX = Math.max(0, Math.min(4, Math.round(a.m))); if (a.s === "p" || a.s === "k") PTSORT = a.s; } } catch (e) { /* nessun salvataggio */ }
+const ptSave = () => { try { localStorage.setItem(PTKEY, JSON.stringify({ i: PANTRY, m: PTMAX, s: PTSORT })); } catch (e) { /* ignora */ } };
 /* ingrediente generico: [etichetta, parole che lo riconoscono (inizio parola)] */
 const PI = {
   pasta: ["Pasta", ["pasta", "spaghetti", "penne", "fusilli", "rigatoni", "tagliatelle", "maccheroni", "farfalle", "linguine", "paccheri"]],
   riso: ["Riso", ["riso"]], couscous: ["Couscous", ["couscous", "cous"]], farro: ["Farro o orzo", ["farro", "orzo"]],
   gnocchi: ["Gnocchi", ["gnocchi"]], patate: ["Patate", ["patat"]],
-  pane: ["Pane o piadina", ["pane", "piadina", "grissini", "crostini", "pancarre", "tramezzin", "cassetta"]],
+  pane: ["Pane o piadina", ["pane$", "pani", "piadina", "grissini", "crostini", "pancarre", "tramezzin", "cassetta"]],
   avena: ["Fiocchi d'avena", ["avena", "fiocchi d'avena", "porridge", "muesli"]],
   uova: ["Uova", ["uova", "uovo", "albumi", "tuorl"]],
   lattic: ["Latte o yogurt", ["latte", "yogurt", "skyr", "kefir"]], yogurt: ["Yogurt", ["yogurt", "skyr", "kefir"]],
@@ -1329,7 +1330,7 @@ const PI = {
   tonno: ["Tonno o sgombro", ["tonno", "sgombro"]], salmone: ["Salmone", ["salmone"]],
   pesce: ["Pesce bianco", ["merluzzo", "nasello", "platessa", "sogliola", "spigola", "orata", "branzino", "pesce"]],
   mare: ["Gamberi o frutti di mare", ["gamberi", "gamberetti", "calamari", "seppie", "polpo", "totani", "cozze", "vongole", "insalata di mare"]],
-  ceci: ["Ceci", ["ceci"]], lent: ["Lenticchie", ["lenticchie"]], fagioli: ["Fagioli", ["fagioli"]], piselli: ["Piselli", ["piselli"]],
+  ceci: ["Ceci", ["ceci"]], lent: ["Lenticchie", ["lenticchie"]], fagioli: ["Fagioli", ["fagioli$", "borlotti", "cannellini"]], piselli: ["Piselli", ["piselli"]],
   pomod: ["Pomodori o passata", ["pomodor", "passata", "pelati", "polpa", "datterini", "ciliegino"]],
   cipaglio: ["Cipolla o aglio", ["cipolla", "scalogno", "aglio", "porro"]],
   zucchine: ["Zucchine", ["zucchin"]], melanzane: ["Melanzane", ["melanzan"]], peperoni: ["Peperoni", ["peperon"]], carote: ["Carote", ["carot"]],
@@ -1337,65 +1338,179 @@ const PI = {
   funghi: ["Funghi", ["funghi", "champignon"]], broccoli: ["Broccoli o cavolfiore", ["broccol", "cavolfiore", "cavolo"]],
   zucca: ["Zucca", ["zucca"]], limone: ["Limone", ["limone", "limoni"]],
   verdure: ["Verdure (zucchine, peperoni, carote…)", ["zucchin", "peperon", "carot", "melanzan", "verdur", "pomodor", "cetriol", "finocch"]],
-  frutta: ["Frutta (banana, mela, frutti di bosco…)", ["banana", "banane", "mela", "mele", "pera", "pere", "frutti di bosco", "fragole", "mirtilli", "lamponi", "kiwi", "arance", "frutta"]],
-  banana: ["Banana", ["banan"]], cioc: ["Cioccolato o cacao", ["cioccolato", "cacao"]]
+  frutta: ["Frutta (banana, mela, frutti di bosco…)", ["banana", "banane", "mela$", "mele$", "pera$", "pere$", "frutti di bosco", "fragole", "mirtilli", "lamponi", "kiwi", "arance", "frutta"]],
+  banana: ["Banana", ["banan"]], fsecca: ["Frutta secca", ["noci", "mandorle", "nocciole", "pistacchi", "anacardi", "arachidi", "frutta secca"]], miele: ["Miele", ["miele"]], fagiolini: ["Fagiolini", ["fagiolini"]], finocchi: ["Finocchi", ["finocch"]], cioc: ["Cioccolato o cacao", ["cioccolato", "cacao"]]
 };
-/* titolo | minuti | ingredienti | procedimento (si presumono sale, pepe, olio e acqua) */
-const RCP = [
-  "Pasta al pomodoro|20|pasta,pomod,cipaglio|Soffriggi cipolla o aglio in poco olio, aggiungi il pomodoro e cuoci 10-15 minuti. Scola la pasta al dente e saltala nel sugo.",
-  "Pasta tonno e pomodoro|20|pasta,tonno,pomod|Scalda il pomodoro con un filo d'olio, unisci il tonno sgocciolato negli ultimi 2 minuti e condisci la pasta.",
-  "Pasta e ceci|30|pasta,ceci,pomod,cipaglio|Rosola cipolla o aglio, aggiungi pomodoro e ceci con un mestolo d'acqua. Cuoci la pasta direttamente nella zuppa.",
-  "Pasta e fagioli|30|pasta,fagioli,pomod,cipaglio|Soffriggi, aggiungi pomodoro e fagioli, schiaccia metà dei fagioli e cuoci la pasta nel brodo denso.",
-  "Pasta zucchine e parmigiano|20|pasta,zucchine,parm|Salta le zucchine a rondelle in padella, mantecale con la pasta e il parmigiano grattugiato.",
-  "Carbonara leggera|20|pasta,uova,prosc,parm|Rosola il prosciutto a cubetti. Fuori dal fuoco unisci pasta, uova sbattute col parmigiano e un po' d'acqua di cottura.",
-  "Pasta e broccoli|25|pasta,broccoli,cipaglio|Cuoci i broccoli a cimette nella stessa acqua della pasta, poi saltali con aglio o cipolla e la pasta.",
-  "Pasta gamberi e zucchine|25|pasta,mare,zucchine|Salta le zucchine, aggiungi i gamberi per 3-4 minuti, sfuma con acqua di cottura e unisci la pasta.",
-  "Pasta ricotta e spinaci|20|pasta,ricotta,spinaci|Appassisci gli spinaci, scioglili con la ricotta e un mestolo d'acqua di cottura, condisci la pasta.",
-  "Gnocchi al pomodoro|15|gnocchi,pomod,parm|Scalda il pomodoro, cuoci gli gnocchi finché vengono a galla e salta tutto con il parmigiano.",
-  "Risotto ai funghi|30|riso,funghi,cipaglio,parm|Tosta il riso con la cipolla, aggiungi i funghi trifolati e brodo caldo poco alla volta; manteca col parmigiano.",
-  "Risotto alla zucca|35|riso,zucca,cipaglio,parm|Cuoci la zucca a cubetti con la cipolla, unisci il riso e il brodo; a fine cottura manteca col parmigiano.",
-  "Riso e piselli|25|riso,piselli,cipaglio|Soffriggi cipolla o aglio, unisci piselli e riso, cuoci con acqua o brodo fino a ottenere una consistenza cremosa.",
-  "Insalata di riso con tonno|25|riso,tonno,pomod,verdure|Lessa il riso, raffreddalo e condiscilo con tonno, pomodori e verdure a pezzetti.",
-  "Couscous con ceci e verdure|15|couscous,ceci,verdure|Idrata il couscous con acqua bollente. Salta verdure e ceci in padella e uniscili.",
-  "Farro freddo|25|farro,pomod,mozz|Lessa il farro, lascialo raffreddare e condiscilo con pomodori e mozzarella a cubetti.",
-  "Zuppa di lenticchie|35|lent,carote,cipaglio,pomod|Soffriggi cipolla e carota, aggiungi pomodoro e lenticchie con acqua e cuoci 20 minuti.",
-  "Zuppa di ceci e farro|40|ceci,farro,cipaglio,pomod|Soffriggi, aggiungi pomodoro, ceci e farro con acqua calda e cuoci finché il farro è tenero.",
-  "Zuppa di verdure|35|patate,carote,zucchine,cipaglio|Taglia tutto a cubetti, rosola la cipolla, copri d'acqua e cuoci 25 minuti. Frulla in parte per renderla cremosa.",
-  "Vellutata di zucca|30|zucca,patate,cipaglio|Cuoci zucca, patata e cipolla in acqua o brodo, poi frulla fino a una crema liscia.",
-  "Frittata di zucchine|20|uova,zucchine,parm|Salta le zucchine, versa le uova sbattute con il parmigiano e cuoci a fuoco dolce da entrambi i lati.",
-  "Frittata di spinaci e ricotta|20|uova,spinaci,ricotta|Appassisci gli spinaci, unisci uova e ricotta a pezzetti e cuoci in padella o al forno.",
-  "Omelette prosciutto e formaggio|10|uova,prosc,mozz|Cuoci le uova sbattute, farcisci con prosciutto e formaggio e richiudi a mezzaluna.",
-  "Uova e spinaci in padella|15|uova,spinaci|Appassisci gli spinaci con aglio, crea due incavi e rompici le uova; copri e cuoci 4-5 minuti.",
-  "Uova strapazzate su pane|10|uova,pane|Strapazza le uova a fuoco basso e servile su fette di pane tostato.",
-  "Pollo ai peperoni|30|pollo,peperoni,cipaglio|Rosola il pollo a pezzi, aggiungi cipolla e peperoni a listarelle e cuoci coperto 15 minuti.",
-  "Pollo al limone|20|pollo,limone|Dora le fettine di pollo, sfuma col succo di limone e lascia restringere il fondo.",
-  "Straccetti di pollo e rucola|20|pollo,insalata,pomod,parm|Cuoci il pollo a striscioline, servilo su rucola e pomodorini con scaglie di parmigiano.",
-  "Pollo e patate al forno|50|pollo,patate,cipaglio|Disponi pollo, patate a spicchi e cipolla in teglia con olio e spezie; cuoci a 200 °C per 40 minuti.",
-  "Lonza e patate al forno|50|maiale,patate,cipaglio|Cuoci la lonza a fette con patate e cipolla in teglia a 190 °C per 40 minuti.",
-  "Polpette al sugo|40|manzo,uova,pane,pomod|Impasta carne, uovo e pane ammollato, forma le polpette e cuocile nel sugo di pomodoro per 15 minuti.",
-  "Hamburger con insalata|20|manzo,insalata,pomod,pane|Cuoci l'hamburger, servilo nel pane con insalata e pomodoro.",
-  "Piadina con pollo e insalata|15|pane,pollo,insalata|Scalda la piadina, farciscila con pollo grigliato e insalata.",
-  "Salmone al forno con patate|35|salmone,patate,limone|Cuoci le patate a spicchi 15 minuti a 200 °C, aggiungi il salmone con limone per altri 12 minuti.",
-  "Merluzzo al pomodoro|25|pesce,pomod,cipaglio|Soffriggi, aggiungi pomodoro e cuoci 8 minuti; adagia il pesce e cuoci coperto per 8-10 minuti.",
-  "Pesce al cartoccio con zucchine|30|pesce,zucchine,pomod|Metti pesce, zucchine e pomodorini in carta forno, chiudi e cuoci a 190 °C per 20 minuti.",
-  "Gamberi con pomodorini|15|mare,pomod,cipaglio|Soffriggi aglio, aggiungi i pomodorini e poi i gamberi per 3-4 minuti.",
-  "Polpo e patate|40|mare,patate,limone|Lessa polpo e patate separatamente, tagliali a pezzi e condisci con limone e olio.",
-  "Insalata di tonno e ceci|10|tonno,ceci,pomod,cipaglio|Unisci tonno sgocciolato, ceci, pomodori e cipolla affettata; condisci con olio e limone o aceto.",
-  "Insalata di pollo|15|pollo,insalata,pomod|Taglia il pollo cotto a striscioline e uniscilo a insalata e pomodori.",
-  "Caprese|5|mozz,pomod|Affetta mozzarella e pomodoro, alternali nel piatto e condisci con olio, sale e origano.",
-  "Toast prosciutto e formaggio|10|pane,prosc,mozz|Farcisci due fette di pane, scalda in padella o piastra da entrambi i lati.",
-  "Bruschette pomodoro e tonno|10|pane,pomod,tonno|Tosta il pane, copri con pomodoro a dadini e tonno sgocciolato.",
-  "Parmigiana light|50|melanzane,pomod,mozz,parm|Griglia le melanzane, stratifica con pomodoro, mozzarella e parmigiano e cuoci a 190 °C per 25 minuti.",
-  "Porridge d'avena|10|avena,lattic,frutta|Cuoci l'avena nel latte per 5 minuti, servi con frutta a pezzi e, se vuoi, un po' di miele.",
-  "Yogurt con frutta e cereali|5|yogurt,frutta,avena|Versa lo yogurt in una ciotola e aggiungi frutta e fiocchi d'avena o cereali.",
-  "Pancake alla banana|15|banana,uova,avena|Schiaccia la banana, mescola con uova e avena e cuoci piccoli dischi in padella antiaderente.",
-  "Mousse di ricotta e cioccolato|10|ricotta,cioc|Monta la ricotta con cacao o cioccolato fuso e raffredda in frigorifero.",
-  "Crema di ceci con verdure crude|10|ceci,limone,carote|Frulla i ceci con limone, olio e un po' d'acqua; servi con bastoncini di carota."
-].map(s => { const p = s.split("|"); return { t: p[0], m: Number(p[1]), k: p[2].split(","), s: p[3] }; });
+/* titolo | minuti | ingrediente:grammi per 1 porzione | olio (g) | procedimento. Si presumono sale, pepe, olio e acqua. */
+const RCP_SRC = [
+  "Pasta al pomodoro|20|pasta:80,pomod:150,cipaglio:15|8|Soffriggi cipolla o aglio in poco olio, aggiungi il pomodoro e cuoci 10-15 minuti. Scola la pasta al dente e saltala nel sugo.",
+  "Pasta tonno e pomodoro|20|pasta:80,tonno:60,pomod:150|8|Scalda il pomodoro con un filo d'olio, unisci il tonno sgocciolato negli ultimi 2 minuti e condisci la pasta.",
+  "Pasta e ceci|30|pasta:60,ceci:120,pomod:100,cipaglio:15|8|Rosola cipolla o aglio, aggiungi pomodoro e ceci con un mestolo d'acqua. Cuoci la pasta direttamente nella zuppa.",
+  "Pasta e fagioli|30|pasta:60,fagioli:130,pomod:100,cipaglio:15|8|Soffriggi, aggiungi pomodoro e fagioli, schiaccia metà dei fagioli e cuoci la pasta nel brodo denso.",
+  "Pasta zucchine e parmigiano|20|pasta:80,zucchine:150,parm:15|8|Salta le zucchine a rondelle in padella, mantecale con la pasta e il parmigiano grattugiato.",
+  "Carbonara leggera|20|pasta:80,uova:60,prosc:40,parm:15|0|Rosola il prosciutto a cubetti. Fuori dal fuoco unisci pasta, uova sbattute col parmigiano e un po' d'acqua di cottura.",
+  "Pasta e broccoli|25|pasta:80,broccoli:200,cipaglio:10,parm:10|8|Cuoci i broccoli a cimette nella stessa acqua della pasta, poi saltali con aglio o cipolla e la pasta.",
+  "Pasta gamberi e zucchine|25|pasta:80,mare:120,zucchine:120|8|Salta le zucchine, aggiungi i gamberi per 3-4 minuti, sfuma con acqua di cottura e unisci la pasta.",
+  "Pasta ricotta e spinaci|20|pasta:80,ricotta:80,spinaci:150|5|Appassisci gli spinaci, scioglili con la ricotta e un mestolo d'acqua di cottura, condisci la pasta.",
+  "Pasta salmone e zucchine|20|pasta:80,salmone:70,zucchine:100|5|Salta le zucchine a dadini, aggiungi il salmone a pezzetti per 2 minuti e manteca con la pasta.",
+  "Pasta alla norma leggera|30|pasta:80,melanzane:150,pomod:150,ricotta:30|8|Cuoci le melanzane a cubetti con il pomodoro; condisci la pasta e completa con ricotta sbriciolata.",
+  "Pasta ai peperoni|25|pasta:80,peperoni:150,cipaglio:15,parm:10|8|Stufa peperoni e cipolla in padella 15 minuti, frulla metà per una crema e condisci la pasta.",
+  "Pasta funghi e prosciutto|25|pasta:80,funghi:150,prosc:40,cipaglio:10|8|Trifola i funghi con l'aglio, aggiungi il prosciutto a listarelle e manteca con la pasta.",
+  "Pasta tonno e limone|15|pasta:80,tonno:70,limone:20|8|Mescola tonno sgocciolato, scorza e succo di limone con un filo d'olio e unisci la pasta calda.",
+  "Pasta e lenticchie|30|pasta:60,lent:130,pomod:80,cipaglio:15|8|Soffriggi, unisci pomodoro e lenticchie, allunga con acqua e cuoci la pasta nel sugo.",
+  "Pasta fredda estiva|20|pasta:80,pomod:120,mozz:60,insalata:30|8|Raffredda la pasta sotto acqua fredda e condiscila con pomodori, mozzarella a cubetti e rucola.",
+  "Pasta e piselli|25|pasta:60,piselli:130,cipaglio:15,prosc:30|8|Rosola la cipolla con il prosciutto, aggiungi i piselli e cuoci la pasta nel loro sugo.",
+  "Pasta pollo e zucchine|25|pasta:80,pollo:100,zucchine:120|8|Cuoci il pollo a dadini con le zucchine e condisci la pasta con un po' d'acqua di cottura.",
+  "Pasta pomodoro e ricotta|20|pasta:80,pomod:150,ricotta:60|5|Scalda il pomodoro, spegni e sciogli la ricotta nel sugo; condisci la pasta.",
+  "Gnocchi al pomodoro|15|gnocchi:200,pomod:150,parm:15|5|Scalda il pomodoro, cuoci gli gnocchi finché vengono a galla e salta tutto con il parmigiano.",
+  "Gnocchi zucchine e prosciutto|20|gnocchi:200,zucchine:120,prosc:40|5|Salta zucchine e prosciutto a listarelle, aggiungi gli gnocchi lessati e mantecali.",
+  "Gnocchi alla sorrentina|20|gnocchi:200,pomod:150,mozz:70|5|Condisci gli gnocchi con il pomodoro, copri di mozzarella e gratina in forno 8 minuti.",
+  "Gnocchi spinaci e ricotta|20|gnocchi:200,spinaci:150,ricotta:60|5|Appassisci gli spinaci, unisci la ricotta e gli gnocchi lessati.",
+  "Patate e verdure al forno|45|patate:250,verdure:150|10|Taglia tutto a pezzi, condisci con olio e spezie e cuoci a 200 °C per 35-40 minuti.",
+  "Tortino di patate e zucchine|45|patate:200,zucchine:150,parm:20,uova:30|5|Stratifica patate e zucchine a fette in teglia, copri con uovo sbattuto e parmigiano e cuoci a 190 °C per 30 minuti.",
+  "Patate e fagiolini|30|patate:200,fagiolini:150,cipaglio:10|8|Lessa insieme patate a tocchi e fagiolini, poi saltali in padella con aglio o cipolla.",
+  "Insalata di patate e tonno|20|patate:200,tonno:70,pomod:100|8|Lessa le patate, lasciale intiepidire e condiscile con tonno, pomodori e olio.",
+  "Risotto ai funghi|30|riso:80,funghi:150,cipaglio:15,parm:15|8|Tosta il riso con la cipolla, aggiungi i funghi trifolati e brodo caldo poco alla volta; manteca col parmigiano.",
+  "Risotto alla zucca|35|riso:80,zucca:200,cipaglio:15,parm:15|8|Cuoci la zucca a cubetti con la cipolla, unisci il riso e il brodo; a fine cottura manteca col parmigiano.",
+  "Riso e piselli|25|riso:80,piselli:130,cipaglio:15|8|Soffriggi cipolla o aglio, unisci piselli e riso, cuoci con acqua o brodo fino a una consistenza cremosa.",
+  "Insalata di riso|25|riso:80,tonno:60,pomod:100,verdure:100|8|Lessa il riso, raffreddalo e condiscilo con tonno, pomodori e verdure a pezzetti.",
+  "Riso alla cantonese leggero|25|riso:80,uova:60,piselli:60,prosc:40|8|Salta il riso lessato con piselli e prosciutto, aggiungi l'uovo strapazzato a fine cottura.",
+  "Riso zucchine e gamberi|25|riso:80,mare:120,zucchine:120|8|Salta le zucchine con i gamberi, unisci il riso lessato e mescola a fuoco vivo.",
+  "Riso con pollo e verdure|30|riso:80,pollo:120,verdure:150|8|Cuoci il pollo a dadini con le verdure, unisci il riso lessato e insaporisci.",
+  "Riso e spinaci|25|riso:80,spinaci:200,parm:15|8|Cuoci il riso con gli spinaci tritati fino a ottenere una consistenza morbida; manteca col parmigiano.",
+  "Riso con salmone e zucchine|25|riso:80,salmone:100,zucchine:100|8|Cuoci il salmone a cubetti con le zucchine e unisci il riso lessato.",
+  "Couscous con ceci e verdure|15|couscous:70,ceci:100,verdure:150|8|Idrata il couscous con acqua bollente. Salta verdure e ceci in padella e uniscili.",
+  "Couscous con pollo e peperoni|20|couscous:70,pollo:120,peperoni:120|8|Idrata il couscous. Cuoci pollo e peperoni a pezzetti e mescola tutto.",
+  "Couscous tonno e pomodori|15|couscous:70,tonno:60,pomod:120|8|Idrata il couscous e condiscilo con tonno sgocciolato, pomodori e un filo d'olio.",
+  "Farro freddo|25|farro:70,pomod:100,mozz:60|8|Lessa il farro, lascialo raffreddare e condiscilo con pomodori e mozzarella a cubetti.",
+  "Farro gamberi e zucchine|30|farro:70,mare:100,zucchine:120|8|Lessa il farro e salta in padella gamberi e zucchine; unisci tutto.",
+  "Orzotto ai funghi|35|farro:70,funghi:150,cipaglio:15,parm:15|8|Cuoci l'orzo o il farro come un risotto con i funghi trifolati; manteca col parmigiano.",
+  "Farro e lenticchie|35|farro:60,lent:120,carote:50,cipaglio:15|8|Rosola cipolla e carota, aggiungi farro e lenticchie con acqua e cuoci finché il farro è tenero.",
+  "Insalata di farro e tonno|20|farro:70,tonno:60,pomod:100,verdure:100|8|Lessa il farro, raffreddalo e condiscilo con tonno, pomodori e verdure a dadini.",
+  "Zuppa di lenticchie|35|lent:200,carote:60,cipaglio:20,pomod:80|8|Soffriggi cipolla e carota, aggiungi pomodoro e lenticchie con acqua e cuoci 20 minuti.",
+  "Zuppa di ceci e farro|40|ceci:130,farro:50,cipaglio:15,pomod:80|8|Soffriggi, aggiungi pomodoro, ceci e farro con acqua calda e cuoci finché il farro è tenero.",
+  "Zuppa di verdure|35|patate:150,carote:80,zucchine:100,cipaglio:20|8|Taglia tutto a cubetti, rosola la cipolla, copri d'acqua e cuoci 25 minuti. Frulla in parte per renderla cremosa.",
+  "Vellutata di zucca|30|zucca:300,patate:100,cipaglio:20|8|Cuoci zucca, patata e cipolla in acqua o brodo, poi frulla fino a una crema liscia.",
+  "Minestrone|45|patate:100,carote:60,zucchine:100,fagioli:80,pomod:80|8|Cuoci tutte le verdure a pezzetti in acqua con i fagioli per 35 minuti; regola di sale.",
+  "Vellutata di broccoli|30|broccoli:250,patate:100,cipaglio:15|8|Lessa broccoli, patata e cipolla, poi frulla con un po' di acqua di cottura.",
+  "Vellutata di spinaci e patate|30|spinaci:200,patate:150,cipaglio:15|5|Cuoci patate e cipolla, aggiungi gli spinaci per 5 minuti e frulla.",
+  "Zuppa di fagioli|35|fagioli:200,pomod:100,cipaglio:15,carote:40|8|Soffriggi cipolla e carota, unisci pomodoro e fagioli, cuoci 20 minuti e schiaccia in parte.",
+  "Zuppa di piselli|30|piselli:200,patate:100,cipaglio:15|8|Cuoci piselli, patata e cipolla in acqua, frulla in parte e servi calda.",
+  "Crema di ceci con verdure crude|10|ceci:150,limone:15,carote:100|10|Frulla i ceci con limone, olio e un po' d'acqua; servi con bastoncini di carota.",
+  "Ceci e spinaci in padella|20|ceci:150,spinaci:150,cipaglio:15|8|Soffriggi l'aglio, aggiungi spinaci e ceci e cuoci 8 minuti.",
+  "Lenticchie e riso|25|lent:150,riso:50,cipaglio:15,carote:40|8|Soffriggi cipolla e carota, unisci lenticchie e riso con acqua e cuoci 15 minuti.",
+  "Insalata di legumi|10|ceci:80,fagioli:80,pomod:100,cipaglio:15|8|Scola i legumi, uniscili a pomodori e cipolla affettata e condisci con olio e aceto.",
+  "Polpette di ceci|30|ceci:200,uova:30,parm:15,cipaglio:10|8|Schiaccia i ceci con uovo, parmigiano e cipolla, forma delle polpette e cuocile a 200 °C per 20 minuti.",
+  "Frittata di zucchine|20|uova:120,zucchine:150,parm:15|5|Salta le zucchine, versa le uova sbattute con il parmigiano e cuoci a fuoco dolce da entrambi i lati.",
+  "Frittata di spinaci e ricotta|20|uova:120,spinaci:150,ricotta:50|5|Appassisci gli spinaci, unisci uova e ricotta a pezzetti e cuoci in padella o al forno.",
+  "Omelette prosciutto e formaggio|10|uova:120,prosc:40,mozz:40|3|Cuoci le uova sbattute, farcisci con prosciutto e formaggio e richiudi a mezzaluna.",
+  "Uova e spinaci in padella|15|uova:120,spinaci:200|5|Appassisci gli spinaci con aglio, crea due incavi e rompici le uova; copri e cuoci 4-5 minuti.",
+  "Uova strapazzate su pane|10|uova:120,pane:60|5|Strapazza le uova a fuoco basso e servile su fette di pane tostato.",
+  "Frittata di patate|25|uova:120,patate:150,cipaglio:20|8|Rosola patate a fettine e cipolla, versa le uova e cuoci a fuoco dolce da entrambi i lati.",
+  "Frittata ai funghi|20|uova:120,funghi:150,parm:10|5|Trifola i funghi, unisci le uova sbattute col parmigiano e cuoci.",
+  "Frittata di peperoni|25|uova:120,peperoni:150,cipaglio:15|6|Stufa peperoni e cipolla, versa le uova e cuoci a fuoco dolce.",
+  "Uova al pomodoro (shakshuka)|20|uova:120,pomod:200,peperoni:80,cipaglio:15|6|Cuoci pomodoro, peperoni e cipolla 10 minuti, poi rompi le uova nel sugo e copri 5 minuti.",
+  "Uova sode con insalata|15|uova:120,insalata:80,pomod:100|8|Cuoci le uova 9 minuti, sgusciale e servile su insalata e pomodori.",
+  "Frittata al forno con verdure|30|uova:120,verdure:200,parm:15|5|Salta le verdure, versale in teglia con uova e parmigiano e cuoci a 180 °C per 15 minuti.",
+  "Piadina con uova e prosciutto|10|pane:70,uova:60,prosc:30|3|Cuoci un uovo al tegamino, scalda la piadina e farciscila con prosciutto e uovo.",
+  "Pollo ai peperoni|30|pollo:150,peperoni:150,cipaglio:15|8|Rosola il pollo a pezzi, aggiungi cipolla e peperoni a listarelle e cuoci coperto 15 minuti.",
+  "Pollo al limone|20|pollo:150,limone:20|8|Dora le fettine di pollo, sfuma col succo di limone e lascia restringere il fondo.",
+  "Straccetti di pollo e rucola|20|pollo:150,insalata:50,pomod:100,parm:15|8|Cuoci il pollo a striscioline, servilo su rucola e pomodorini con scaglie di parmigiano.",
+  "Pollo e patate al forno|50|pollo:150,patate:200,cipaglio:15|10|Disponi pollo, patate a spicchi e cipolla in teglia con olio e spezie; cuoci a 200 °C per 40 minuti.",
+  "Pollo e zucchine|25|pollo:150,zucchine:200,cipaglio:10|8|Rosola il pollo a bocconcini, aggiungi le zucchine e cuoci 10 minuti.",
+  "Pollo al pomodoro|30|pollo:150,pomod:200,cipaglio:15|8|Rosola il pollo, aggiungi il pomodoro e cuoci coperto 20 minuti.",
+  "Pollo ai funghi|25|pollo:150,funghi:200,cipaglio:10|8|Cuoci il pollo a pezzi, aggiungi i funghi affettati e sfuma con un po' d'acqua.",
+  "Spiedini di pollo e verdure|30|pollo:150,peperoni:100,zucchine:100|8|Infilza pollo e verdure a pezzi su stecchi, condisci e cuoci in padella o forno 15-20 minuti.",
+  "Pollo e spinaci|25|pollo:150,spinaci:200,cipaglio:10|8|Cuoci il pollo a fettine, appassisci gli spinaci con aglio e servi insieme.",
+  "Pollo ripieno di prosciutto e formaggio|30|pollo:150,prosc:30,mozz:40|6|Apri la fetta di pollo, farcisci con prosciutto e formaggio, chiudi con uno stecchino e cuoci in padella.",
+  "Pollo con carote e piselli|30|pollo:150,carote:100,piselli:80,cipaglio:15|8|Rosola il pollo con cipolla, aggiungi carote e piselli e cuoci coperto 20 minuti.",
+  "Insalata di pollo|15|pollo:120,insalata:80,pomod:100|8|Taglia il pollo cotto a striscioline e uniscilo a insalata e pomodori.",
+  "Piadina con pollo e insalata|15|pane:70,pollo:100,insalata:40|5|Scalda la piadina, farciscila con pollo grigliato e insalata.",
+  "Cotolette di pollo al forno|30|pollo:150,uova:30,pane:20|8|Passa le fettine nell'uovo e nel pane grattugiato e cuocile a 200 °C per 15 minuti.",
+  "Pollo e broccoli|25|pollo:150,broccoli:200,cipaglio:10|8|Rosola il pollo, aggiungi i broccoli a cimette con un po' d'acqua e cuoci coperto 12 minuti.",
+  "Pollo e fagiolini|25|pollo:150,fagiolini:200,pomod:80|8|Rosola il pollo, aggiungi fagiolini e pomodoro e cuoci coperto 15 minuti.",
+  "Polpette al sugo|40|manzo:150,uova:30,pane:30,pomod:150|8|Impasta carne, uovo e pane ammollato, forma le polpette e cuocile nel sugo di pomodoro per 15 minuti.",
+  "Hamburger con insalata|20|manzo:150,insalata:60,pomod:80,pane:60|5|Cuoci l'hamburger, servilo nel pane con insalata e pomodoro.",
+  "Spezzatino con patate|60|manzo:150,patate:200,carote:60,cipaglio:20|8|Rosola la carne a cubetti con la cipolla, aggiungi patate e carote, copri d'acqua e cuoci 40 minuti.",
+  "Lonza e patate al forno|50|maiale:150,patate:200,cipaglio:15|10|Cuoci la lonza a fette con patate e cipolla in teglia a 190 °C per 40 minuti.",
+  "Lonza ai funghi|25|maiale:150,funghi:200,cipaglio:10|8|Rosola la lonza a fette, aggiungi i funghi e cuoci coperto 10 minuti.",
+  "Manzo ai peperoni|35|manzo:150,peperoni:150,cipaglio:15|8|Rosola la carne a strisce con la cipolla, aggiungi i peperoni e cuoci 20 minuti.",
+  "Straccetti di manzo e rucola|20|manzo:150,insalata:50,pomod:80,parm:15|8|Scotta la carne a strisce in padella molto calda e servila su rucola e pomodori con scaglie di parmigiano.",
+  "Polpettone al forno|50|manzo:200,uova:50,parm:20,pane:30|5|Impasta carne, uovo, parmigiano e pane ammollato, forma un rotolo e cuoci a 180 °C per 40 minuti.",
+  "Pasta al ragù leggero|50|pasta:80,manzo:100,pomod:200,carote:30,cipaglio:15|8|Soffriggi cipolla e carota, rosola la carne tritata, aggiungi il pomodoro e cuoci 30 minuti; condisci la pasta.",
+  "Manzo e zucchine in padella|25|manzo:150,zucchine:200,cipaglio:10|8|Rosola la carne a pezzetti, aggiungi le zucchine a rondelle e cuoci 10 minuti.",
+  "Salmone al forno con patate|35|salmone:150,patate:200,limone:20|8|Cuoci le patate a spicchi 15 minuti a 200 °C, aggiungi il salmone con limone per altri 12 minuti.",
+  "Merluzzo al pomodoro|25|pesce:180,pomod:150,cipaglio:15|8|Soffriggi, aggiungi pomodoro e cuoci 8 minuti; adagia il pesce e cuoci coperto per 8-10 minuti.",
+  "Pesce al cartoccio con zucchine|30|pesce:180,zucchine:150,pomod:100|8|Metti pesce, zucchine e pomodorini in carta forno, chiudi e cuoci a 190 °C per 20 minuti.",
+  "Gamberi con pomodorini|15|mare:150,pomod:150,cipaglio:10|8|Soffriggi aglio, aggiungi i pomodorini e poi i gamberi per 3-4 minuti.",
+  "Polpo e patate|40|mare:150,patate:200,limone:15|8|Lessa polpo e patate separatamente, tagliali a pezzi e condisci con limone e olio.",
+  "Salmone e zucchine|20|salmone:150,zucchine:200,limone:10|5|Cuoci il salmone in padella con le zucchine a rondelle e finisci con succo di limone.",
+  "Pesce, patate e pomodorini al forno|40|pesce:180,patate:200,pomod:100|8|Cuoci patate a fette sottili 15 minuti, aggiungi pesce e pomodorini e cuoci altri 15 minuti a 200 °C.",
+  "Pesce al limone|25|pesce:180,limone:20,cipaglio:10|8|Cuoci il pesce in padella o al forno con aglio, succo e scorza di limone.",
+  "Calamari in umido|35|mare:200,pomod:150,cipaglio:15|8|Soffriggi, aggiungi i calamari a pezzi e il pomodoro, cuoci coperto 25 minuti.",
+  "Gamberi e zucchine in padella|15|mare:150,zucchine:200,cipaglio:10|8|Salta le zucchine, aggiungi i gamberi per 3-4 minuti e finisci con aglio.",
+  "Insalata di mare|15|mare:200,insalata:60,limone:15|8|Lessa il pesce, lascialo raffreddare e condiscilo con limone e olio su un letto di insalata.",
+  "Tonno con fagioli e cipolla|10|tonno:80,fagioli:150,cipaglio:20|8|Scola i fagioli, uniscili al tonno e alla cipolla affettata sottile e condisci.",
+  "Pesce e spinaci|25|pesce:180,spinaci:200,limone:15|8|Cuoci il pesce in padella, appassisci gli spinaci con aglio e servi con limone.",
+  "Salmone e broccoli|25|salmone:150,broccoli:200,limone:10|5|Cuoci i broccoli a vapore, rosola il salmone e servi con limone.",
+  "Merluzzo con piselli|25|pesce:180,piselli:150,cipaglio:15|8|Soffriggi la cipolla, aggiungi i piselli e adagia il pesce; cuoci coperto 10 minuti.",
+  "Polpette di tonno e patate|30|tonno:120,patate:150,uova:30|8|Schiaccia le patate lessate, mescola con tonno e uovo, forma polpette e cuocile al forno a 200 °C per 20 minuti.",
+  "Insalata di tonno e ceci|10|tonno:70,ceci:120,pomod:100,cipaglio:15|8|Unisci tonno sgocciolato, ceci, pomodori e cipolla affettata; condisci con olio e limone o aceto.",
+  "Caprese|5|mozz:120,pomod:200|8|Affetta mozzarella e pomodoro, alternali nel piatto e condisci con olio, sale e origano.",
+  "Insalatona con uova e tonno|10|insalata:100,tonno:70,uova:60,pomod:100|8|Componi l'insalata con pomodori, tonno e uova sode a spicchi.",
+  "Insalata di patate e fagiolini|25|patate:200,fagiolini:150,tonno:50|8|Lessa patate e fagiolini, lasciali raffreddare e condisci con tonno e olio.",
+  "Insalatona prosciutto e mozzarella|10|insalata:100,prosc:50,mozz:80,pomod:100|8|Componi tutto in una ciotola e condisci con olio e aceto.",
+  "Insalata di ceci e verdure|10|ceci:150,verdure:150,cipaglio:15|8|Mescola ceci e verdure crude a dadini e condisci con olio e limone.",
+  "Insalata di lenticchie|10|lent:150,carote:60,pomod:80,cipaglio:15|8|Unisci lenticchie, carota a dadini, pomodori e cipolla e condisci con olio e aceto.",
+  "Insalata di spinaci e uova|10|spinaci:100,uova:60,pomod:80,parm:15|8|Spinaci novelli crudi, uovo sodo, pomodori e scaglie di parmigiano.",
+  "Carpaccio di bresaola e rucola|5|prosc:80,insalata:50,parm:20|6|Disponi la bresaola su un piatto, copri con rucola e scaglie di parmigiano, condisci con limone e olio.",
+  "Verdure crude con ricotta|10|ricotta:100,carote:100,finocchi:100|0|Taglia carote e finocchi a bastoncini e servili con la ricotta condita con pepe e erbe.",
+  "Toast prosciutto e formaggio|10|pane:80,prosc:50,mozz:40|0|Farcisci due fette di pane, scalda in padella o piastra da entrambi i lati.",
+  "Bruschette pomodoro e tonno|10|pane:80,pomod:100,tonno:50|6|Tosta il pane, copri con pomodoro a dadini e tonno sgocciolato.",
+  "Bruschetta ricotta e zucchine|15|pane:60,ricotta:60,zucchine:100|5|Griglia le zucchine, spalma la ricotta sul pane tostato e completa con le zucchine.",
+  "Panino con tonno e insalata|5|pane:80,tonno:60,insalata:30|3|Farcisci il pane con tonno sgocciolato e insalata, aggiungi un filo d'olio.",
+  "Crostini ricotta e pomodoro|10|pane:60,ricotta:60,pomod:80|3|Tosta il pane, spalma la ricotta e copri con pomodoro a dadini.",
+  "Piadina prosciutto e mozzarella|10|pane:70,prosc:50,mozz:60|0|Scalda la piadina, farciscila con prosciutto e mozzarella e richiudi.",
+  "Pane, ricotta e miele|5|pane:50,ricotta:80,miele:15|0|Spalma la ricotta sul pane tostato e completa con un filo di miele.",
+  "Tramezzino tonno e uova|10|pane:60,tonno:60,uova:60|3|Schiaccia uovo sodo e tonno e farcisci il pane in cassetta.",
+  "Porridge d'avena|10|avena:50,lattic:200,frutta:100|0|Cuoci l'avena nel latte per 5 minuti, servi con frutta a pezzi e, se vuoi, un po' di miele.",
+  "Yogurt con frutta e cereali|5|yogurt:150,frutta:100,avena:30|0|Versa lo yogurt in una ciotola e aggiungi frutta e fiocchi d'avena o cereali.",
+  "Pancake alla banana|15|banana:100,uova:60,avena:40|5|Schiaccia la banana, mescola con uova e avena e cuoci piccoli dischi in padella antiaderente.",
+  "Mousse di ricotta e cioccolato|10|ricotta:100,cioc:15|0|Monta la ricotta con cacao o cioccolato fuso e raffredda in frigorifero.",
+  "Overnight oats|5|avena:50,yogurt:120,frutta:100|0|Mescola avena e yogurt, lascia in frigo tutta la notte e aggiungi la frutta al mattino.",
+  "Yogurt con noci e miele|5|yogurt:150,fsecca:20,miele:10|0|Versa lo yogurt in una ciotola e completa con frutta secca tritata e miele.",
+  "Frullato di frutta e yogurt|5|yogurt:150,frutta:150,lattic:100|0|Frulla tutto con qualche cubetto di ghiaccio.",
+  "Porridge banana e cacao|10|avena:50,lattic:200,banana:100,cioc:10|0|Cuoci l'avena nel latte, aggiungi banana a rondelle e cioccolato fondente grattugiato.",
+  "Ricotta con frutta e noci|5|ricotta:100,frutta:100,fsecca:15|0|Servi la ricotta con frutta a pezzi e frutta secca tritata.",
+  "Pane tostato con ricotta e frutta|5|pane:50,ricotta:80,frutta:100|0|Spalma la ricotta sul pane tostato e completa con frutta a fette.",
+  "Pancake di avena e yogurt|15|avena:50,yogurt:100,uova:60|5|Frulla tutto fino a ottenere una pastella e cuoci piccoli dischi in padella antiaderente.",
+  "Parmigiana light|50|melanzane:250,pomod:150,mozz:80,parm:20|8|Griglia le melanzane, stratifica con pomodoro, mozzarella e parmigiano e cuoci a 190 °C per 25 minuti.",
+  "Zucchine ripiene di ricotta|35|zucchine:300,ricotta:80,parm:15|5|Svuota le zucchine, riempile con ricotta e parmigiano e cuoci a 190 °C per 25 minuti.",
+  "Peperoni ripieni di riso e tonno|45|peperoni:250,riso:50,tonno:50|6|Riempi i peperoni con riso lessato e tonno e cuoci a 190 °C per 30 minuti.",
+  "Melanzane ripiene|45|melanzane:250,pomod:100,mozz:60,prosc:30|8|Svuota le melanzane, farciscile con polpa, pomodoro, prosciutto e mozzarella e cuoci a 190 °C per 30 minuti.",
+  "Spinaci alla ricotta al forno|30|spinaci:250,ricotta:100,parm:15,uova:30|3|Mescola spinaci cotti, ricotta, uovo e parmigiano in una teglia e cuoci a 180 °C per 20 minuti.",
+  "Verdure grigliate con mozzarella|20|verdure:250,mozz:80|8|Griglia le verdure a fette e servile con la mozzarella a pezzi.",
+  "Funghi trifolati con limone|20|funghi:250,cipaglio:10,limone:10|8|Salta i funghi a fette con aglio a fuoco vivo e finisci con limone.",
+  "Cavolfiore e broccoli al forno|35|broccoli:250,parm:20,cipaglio:10|8|Cuoci a 200 °C per 25 minuti, cospargi di parmigiano gli ultimi 5.",
+  "Finocchi gratinati|35|finocchi:250,parm:20,ricotta:40|5|Lessa i finocchi a spicchi, coprili con ricotta e parmigiano e gratina in forno.",
+  "Zuppa di pomodoro e pane|25|pomod:250,pane:60,cipaglio:15|8|Cuoci il pomodoro con cipolla 15 minuti, aggiungi il pane a pezzetti e lascia insaporire."
+];
+/* alimento del database (o valori propri per 100 g) per ogni ingrediente generico */
+const PN = { pasta: "pasta", riso: "riso", couscous: "couscous", farro: "farro", gnocchi: "gnocchi", patate: "patate", pane: "pane", yogurt: "yog_greco", ricotta: "ricotta", mozz: "mozz", parm: "grana", pollo: "pollo", manzo: "bovino", maiale: "suino", prosc: "cotto", tonno: "tonno_n", salmone: "salmone_f", pesce: "merluzzo", mare: "gamberi", ceci: "ceci", lent: "lenticchie", fagioli: "fagioli", piselli: "piselli", pomod: "v_pomodori", zucchine: "v_zucchine", melanzane: "v_melanzane", peperoni: "v_peperoni", carote: "v_carote", spinaci: "v_spinaci", insalata: "v_insalata", funghi: "v_funghi", broccoli: "v_broccoli", verdure: "v_zucchine", frutta: "fr_mela", banana: "fr_banane", cioc: "ciocc", fsecca: "fs_mandorle", miele: "miele", fagiolini: "v_fagiolini", finocchi: "v_finocchi" };
+const PX = { uova: ["Uova (intere)", 143, 12.6, 0.7, 9.5], lattic: ["Latte parzialmente scremato", 46, 3.3, 4.9, 1.5], cipaglio: ["Cipolla", 40, 1.1, 9, 0.1], zucca: ["Zucca", 26, 1, 6.5, 0.1], limone: ["Limone", 29, 1.1, 9, 0.3], avena: ["Fiocchi d'avena", 372, 13.5, 60, 7] };
+const per100 = k => PN[k] && I[PN[k]] ? I[PN[k]] : PX[k] ? { k: PX[k][1], p: PX[k][2], c: PX[k][3], f: PX[k][4] } : null;
+const RCP = RCP_SRC.map(s => {
+  const p = s.split("|"), g = {}, k = [];
+  p[2].split(",").forEach(x => { const y = x.split(":"); k.push(y[0]); g[y[0]] = Number(y[1]); });
+  const r = { t: p[0], m: Number(p[1]), k: k, g: g, o: Number(p[3]), s: p[4], x: zero() };
+  k.forEach(q => { const n = per100(q); if (n) r.x = add(r.x, { k: n.k * g[q] / 100, p: n.p * g[q] / 100, c: n.c * g[q] / 100, f: n.f * g[q] / 100 }); });
+  if (r.o > 0 && I.olio) r.x = add(r.x, { k: I.olio.k * r.o / 100, p: 0, c: 0, f: I.olio.f * r.o / 100 });
+  return r;
+});
 const tokens = s => norm(s).split(/[^a-z0-9']+/).filter(Boolean);
 function ptHas(key) {
   const words = PI[key][1];
-  return PANTRY.some(h => { const n = norm(h), tk = tokens(h); return words.some(w => w.indexOf(" ") >= 0 || w.indexOf("'") >= 0 ? n.indexOf(w) >= 0 : tk.some(x => x.indexOf(w) === 0)); });
+  return PANTRY.some(h => { const n = norm(h), tk = tokens(h); return words.some(w => w.slice(-1) === "$" ? tk.indexOf(w.slice(0, -1)) >= 0 : w.indexOf(" ") >= 0 || w.indexOf("'") >= 0 ? n.indexOf(w) >= 0 : tk.some(x => x.indexOf(w) === 0)); });
 }
 const PT_QUICK = ["Pasta", "Riso", "Uova", "Pomodori", "Cipolla", "Aglio", "Zucchine", "Patate", "Carote", "Spinaci", "Pollo", "Tonno", "Mozzarella", "Parmigiano", "Pane", "Yogurt", "Ceci", "Limone", "Banana", "Avena"];
 function ptResults() {
@@ -1404,7 +1519,9 @@ function ptResults() {
     r.k.forEach(k => (ptHas(k) ? have : miss).push(PI[k][0]));
     return { r: r, have: have, miss: miss };
   }).filter(x => x.have.length >= Math.min(2, x.r.k.length) && x.miss.length <= PTMAX);
-  out.sort((a, b) => a.miss.length - b.miss.length || b.have.length / b.r.k.length - a.have.length / a.r.k.length || a.r.t.localeCompare(b.r.t));
+  if (PTSORT === "p") out.sort((a, b) => b.r.x.p - a.r.x.p || a.miss.length - b.miss.length);
+  else if (PTSORT === "k") out.sort((a, b) => a.r.x.k - b.r.x.k || a.miss.length - b.miss.length);
+  else out.sort((a, b) => a.miss.length - b.miss.length || b.have.length / b.r.k.length - a.have.length / a.r.k.length || a.r.t.localeCompare(b.r.t));
   return out;
 }
 function renderPantry() {
@@ -1417,18 +1534,39 @@ function renderPantry() {
       '<div class="ptchips" id="ptchips"></div>' +
       '<div class="ptadd"><input type="text" id="pt_in" list="pt_dl" autocomplete="off" placeholder="Aggiungi un alimento (es. pasta, zucchine, tonno…)" aria-label="Aggiungi un alimento"><datalist id="pt_dl">' + names.map(n => '<option value="' + esc(n) + '">').join("") + '</datalist><button type="button" class="btn pri" data-act="ptadd">Aggiungi</button></div>' +
       '<div class="ptlist" id="ptlist"></div>' +
-      '<div class="ptctl"><label>Ingredienti mancanti ammessi <select id="pt_max"><option value="0">nessuno</option><option value="1">fino a 1</option><option value="2">fino a 2</option><option value="3">fino a 3</option><option value="4">fino a 4</option></select></label></div><div id="ptres"></div>';
-    $("#pt_max").value = String(PTMAX);
+      '<div class="ptctl"><label>Ingredienti mancanti ammessi <select id="pt_max"><option value="0">nessuno</option><option value="1">fino a 1</option><option value="2">fino a 2</option><option value="3">fino a 3</option><option value="4">fino a 4</option></select></label> <label>Ordina per <select id="pt_sort"><option value="m">ingredienti mancanti</option><option value="p">più proteine</option><option value="k">meno calorie</option></select></label></div><div class="dbstat" id="pt_msg" role="status"></div><div id="ptres"></div>';
+    $("#pt_max").value = String(PTMAX); $("#pt_sort").value = PTSORT;
   }
   $("#ptchips").innerHTML = '<span class="hint">Aggiunta rapida:</span>' + PT_QUICK.map((n, i) => '<button type="button" class="ptc" data-act="ptchip" data-n="' + i + '" aria-pressed="' + PANTRY.some(h => norm(h) === norm(n)) + '">' + n + '</button>').join("");
   $("#ptlist").innerHTML = PANTRY.length ? PANTRY.map((h, i) => '<span class="ptag">' + esc(h) + '<button type="button" data-act="ptdel" data-i="' + i + '" aria-label="Rimuovi ' + esc(h) + '">✕</button></span>').join("") : '<p class="hint">La dispensa è vuota.</p>';
-  const res = ptResults();
-  $("#ptres").innerHTML = !PANTRY.length ? '' : res.length ? '<h3>' + res.length + (res.length === 1 ? ' ricetta possibile' : ' ricette possibili') + '</h3>' + res.map(x => '<details class="rcp"><summary><b>' + esc(x.r.t) + '</b> <span class="hint">' + x.r.m + ' min</span><div class="rcpm ' + (x.miss.length ? 'no' : 'ok') + '">' + (x.miss.length ? 'Manca: ' + esc(x.miss.join(', ')) : 'Hai tutto') + '</div></summary><div class="rcpb"><p><b>Hai:</b> ' + esc(x.have.join(', ')) + '</p><p>' + esc(x.r.s) + '</p></div></details>').join("") : '<p class="hint">Nessuna ricetta con queste condizioni: aggiungi altri alimenti o consenti più ingredienti mancanti.</p>';
+  const res = ptResults(), shown = res.slice(0, 60), opts = '<option value="new">Nuovo pasto</option>' + state.meals.map(m => '<option value="' + m.id + '">' + esc(m.name) + '</option>').join("");
+  const mc = x => r0(x.r.x.k) + ' kcal · P ' + r0(x.r.x.p) + ' g · C ' + r0(x.r.x.c) + ' g · G ' + r0(x.r.x.f) + ' g';
+  $("#ptres").innerHTML = !PANTRY.length ? '' : res.length ? '<h3>' + res.length + (res.length === 1 ? ' ricetta possibile' : ' ricette possibili') + '</h3>' + shown.map(x => '<details class="rcp"><summary><b>' + esc(x.r.t) + '</b> <span class="hint">' + x.r.m + ' min · ' + r0(x.r.x.k) + ' kcal · P ' + r0(x.r.x.p) + ' g</span><div class="rcpm ' + (x.miss.length ? 'no' : 'ok') + '">' + (x.miss.length ? 'Manca: ' + esc(x.miss.join(', ')) : 'Hai tutto') + '</div></summary><div class="rcpb"><p class="num">Per 1 porzione: ' + mc(x) + '</p><p><b>Ingredienti:</b> ' + x.r.k.map(k => esc(PI[k][0]) + ' ' + x.r.g[k] + ' g').join(', ') + (x.r.o ? ', olio ' + x.r.o + ' g' : '') + '</p><p>' + esc(x.r.s) + '</p><div class="rcpadd"><select aria-label="Aggiungi a">' + opts + '</select><button type="button" class="btn sm pri" data-act="rcpadd" data-t="' + esc(x.r.t) + '">Aggiungi al piano</button></div></div></details>').join("") + (res.length > shown.length ? '<p class="wlnote">Mostro le prime ' + shown.length + ' su ' + res.length + ': riduci gli ingredienti mancanti ammessi per restringere.</p>' : '') : '<p class="hint">Nessuna ricetta con queste condizioni: aggiungi altri alimenti o consenti più ingredienti mancanti.</p>';
 }
 function ptAdd(name) {
   name = String(name || "").trim().slice(0, 50);
   if (!name || PANTRY.some(h => norm(h) === norm(name)) || PANTRY.length >= 100) return;
   PANTRY.push(name); ptSave(); renderPantry();
+}
+
+/* aggiunge gli ingredienti di una ricetta a un pasto del giorno corrente (o a un nuovo pasto) */
+function rcpFood(k) {
+  if (PN[k] && I[PN[k]]) return PN[k];
+  const x = PX[k]; if (!x) return null;
+  let c = custom.find(y => y.name === x[0]);
+  if (!c) { registerCustom({ name: x[0], k: x[1], p: x[2], c: x[3], f: x[4] }); saveCustom(); c = custom[custom.length - 1]; }
+  return c.id;
+}
+function rcpAdd(title, target) {
+  const r = RCP.find(x => x.t === title); if (!r) return "";
+  const rows = r.k.map(k => ({ id: rcpFood(k), g: r.g[k] })).filter(x => x.id);
+  if (r.o > 0 && I.olio) rows.push({ id: "olio", g: r.o });
+  if (target === "new" || !meal(target)) {
+    if (state.meals.length >= 12) return "Ci sono già 12 pasti: scegline uno esistente.";
+    state.meals.push({ id: newId(), name: r.t, kind: null, rows: rows });
+  } else { const m = meal(target); m.rows = m.rows.filter(x => x.id).concat(rows); }
+  renderCols(); refreshNums(); renderPantry();
+  return "Aggiunta «" + r.t + "» al piano (" + r0(r.x.k) + " kcal).";
 }
 
 
@@ -2387,6 +2525,7 @@ document.addEventListener("click", ev => {
     WD = WD.filter(x => x.d !== el.dataset.d); wdSave(); wdSync(); renderDiary(); renderWLRes(); renderAvatar();
   } else if (act === "ptadd") { const i = $("#pt_in"); ptAdd(i.value); i.value = ""; i.focus();
   } else if (act === "ptchip") { const n = PT_QUICK[Number(el.dataset.n)], x = PANTRY.findIndex(h => norm(h) === norm(n)); if (x >= 0) PANTRY.splice(x, 1); else PANTRY.push(n); ptSave(); renderPantry();
+  } else if (act === "rcpadd") { const sel = el.parentNode.querySelector("select"), msg = rcpAdd(el.dataset.t, sel ? sel.value : "new"); const mm = $("#pt_msg"); if (mm) mm.textContent = msg;
   } else if (act === "ptdel") { PANTRY.splice(Number(el.dataset.i), 1); ptSave(); renderPantry();
   } else if (act === "bkmake") {
     const t = JSON.stringify(backupObject()); $("#bk_txt").value = t; bkMsg("Backup creato (" + (t.length / 1024).toFixed(1) + " KB).");
@@ -2523,6 +2662,7 @@ document.addEventListener("keydown", ev => {
 document.addEventListener("visibilitychange", () => { if (!document.hidden && watFix()) renderAvatar(); });
 document.addEventListener("change", ev => {
   if (ev.target && ev.target.id === "pt_max") { PTMAX = Number(ev.target.value) || 0; ptSave(); renderPantry(); return; }
+  if (ev.target && ev.target.id === "pt_sort") { PTSORT = ev.target.value; ptSave(); renderPantry(); return; }
   const el = ev.target, a = el.dataset && el.dataset.act;
   if (el.id === "bk_file" && el.files && el.files[0]) {
     const fr = new FileReader(); fr.onload = () => { $("#bk_txt").value = String(fr.result).slice(0, 2000000); bkMsg("File caricato: premi Importa per ripristinare."); }; fr.readAsText(el.files[0]); return;
