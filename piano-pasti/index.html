@@ -395,9 +395,9 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;font-si
 .wdform{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin:8px 0}
 .wdform label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);font-weight:600}
 .wdform input,.ptadd input,.ptctl select{font:inherit;font-size:14px;color:var(--ink);padding:6px 8px;border:1.5px solid var(--rule);background:var(--bg);border-radius:0;min-width:0}
-.wdsvg{width:100%;max-width:380px;height:auto;display:block;margin:6px 0}
-.wdt{font:600 9px var(--font-num);fill:var(--muted)}
-.wdlist{list-style:none;margin:6px 0 0;padding:0;max-width:560px}
+.wdsvg{width:100%;max-width:720px;height:auto;display:block;margin:6px 0}
+.wdt{font:600 11px var(--font-num);fill:var(--muted)}
+.wdlist{list-style:none;margin:6px 0 0;padding:0;max-width:720px}
 .wdlist li{display:grid;grid-template-columns:1fr auto 56px auto;gap:10px;align-items:center;padding:4px 0;border-bottom:1px solid var(--line);font-size:14px}
 .wdd{color:var(--muted);text-align:right;font-size:12px}
 #wdbox{margin-top:18px;border-top:2px solid var(--line);padding-top:10px}
@@ -414,6 +414,12 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;font-si
 .rcpm{font-size:13px;font-weight:700;margin-top:2px}.rcpm.ok{color:var(--c2)}.rcpm.no{color:var(--accent)}
 .rcpb{margin-top:6px;font-size:14px}.rcpb p{margin:4px 0}
 .rcpadd{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}.rcpadd select{font:inherit;font-size:13px;padding:5px 8px;border:1.5px solid var(--rule);background:var(--bg);color:var(--ink);min-width:0}
+.av-happy{opacity:0}
+.avc.happy .av-eyes{opacity:0}.avc.happy .av-happy{opacity:1}
+.avc.happy .av-cheek{opacity:1}
+.ptview{margin:8px 0}
+.bkq{width:100%;box-sizing:border-box;font:inherit;font-size:14px;color:var(--ink);padding:8px 10px;border:1.5px solid var(--rule);background:var(--bg);border-radius:0;margin:8px 0}
+.bkdet{margin:6px 0}.bkdet summary{cursor:pointer;font-weight:700;font-size:13px;padding:4px 0}
 </style>
 
 <div class="wrap">
@@ -1167,11 +1173,10 @@ function avFig(sex, bmi, tone, label, cap, mod, water) {
   /* acqua bevuta: il corpo si colora d'azzurro dal basso, con gradiente */
   let wtrH = "";
   if (water > 0) {
-    const y = 224 - Math.min(1, water) * 214, ys = y.toFixed(1), id = "avw" + (++AVW);
-    const wave = "M0 " + ys + " Q25 " + (y - 3).toFixed(1) + " 50 " + ys + " T100 " + ys + " T150 " + ys + " T200 " + ys + " V240 H0 Z";
-    const grad = '<linearGradient id="' + id + 'g" gradientUnits="userSpaceOnUse" x1="0" y1="' + ys + '" x2="0" y2="224"><stop offset="0" stop-color="#DDF3FF"/><stop offset=".55" stop-color="#8DCBF0"/><stop offset="1" stop-color="#3F9EDB"/></linearGradient>';
-    const lay = m => '<path d="' + wave + '" fill="url(#' + id + 'g)" opacity=".92" mask="url(#' + id + m + ')"/>';
-    g += '<defs>' + grad + '<mask id="' + id + 'b" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="244">' + body(false, 0, "#fff") + '</mask></defs>' + lay("b");
+    const y = 224 - Math.min(1, water) * 214, id = "avw" + (++AVW);
+    const wy0 = water >= 1 ? -60 : y, ys = wy0.toFixed(1);
+    const lay = m => '<path class="av-wp" data-y="' + ys + '" d="' + watPath(wy0, 0, 0, 0) + '" fill="#72C4F0" mask="url(#' + id + m + ')"/>';
+    g += '<defs><mask id="' + id + 'b" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="244">' + body(false, 0, "#fff") + '</mask></defs>' + lay("b");
     wtrH = '<defs><mask id="' + id + 'h" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="244"><rect fill="#fff" x="' + (cx - hw).toFixed(1) + '" y="22" width="' + (hw * 2).toFixed(1) + '" height="' + (74 + s * 3).toFixed(1) + '" rx="34" ry="34"/></mask></defs>' + lay("h");
   }
   /* testa generica */
@@ -1186,7 +1191,7 @@ function avFig(sex, bmi, tone, label, cap, mod, water) {
     hd += '<g fill="none" stroke="var(--bg)" stroke-width="2" stroke-linecap="round"><path d="M' + P(-22, 20) + ' Q' + P(-8, 12) + ' ' + P(8, 14) + '"/><path d="M' + P(-12, 28) + ' Q' + P(4, 20) + ' ' + P(24, 22) + '"/><path d="M' + P(-26, 36) + ' Q' + P(-6, 28) + ' ' + P(10, 32) + '"/><path d="M' + P(18, 12) + ' Q' + P(32, 18) + ' ' + P(36, 32) + '"/></g>';
   }
   const eye = k => { const x = cx + k * 17; return '<ellipse cx="' + x + '" cy="68" rx="9" ry="10.5" fill="var(--ink)"/><circle cx="' + (x - 3) + '" cy="63.6" r="3.6" style="fill:var(--bg)"/><circle cx="' + (x + 3.2) + '" cy="72.6" r="1.7" style="fill:var(--bg)"/>'; };
-  hd += '<g class="av-eyes">' + eye(-1) + eye(1) + '</g>';
+  hd += '<g class="av-eyes">' + eye(-1) + eye(1) + '</g><g class="av-happy" fill="none" style="stroke:var(--ink)" stroke-width="3.6" stroke-linecap="round"><path d="M' + (cx - 26) + ' 71 Q' + (cx - 17) + ' 56 ' + (cx - 8) + ' 71"/><path d="M' + (cx + 8) + ' 71 Q' + (cx + 17) + ' 56 ' + (cx + 26) + ' 71"/></g>';
   if (f) hd += '<g class="avs" stroke-width="2.2"><path d="M' + P(-24, 66) + ' l-4 1 M' + P(24, 66) + ' l4 1"/></g>';
   hd += '<ellipse cx="' + (cx - 27) + '" cy="82" rx="6" ry="3.6" style="fill:var(--line)"/><ellipse cx="' + (cx + 27) + '" cy="82" rx="6" ry="3.6" style="fill:var(--line)"/></g></g>';
   g += hd;
@@ -1248,7 +1253,7 @@ try { const a = JSON.parse(localStorage.getItem(DKEY)); if (Array.isArray(a)) WD
 WD.sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : 0);
 const wdSave = () => { try { localStorage.setItem(DKEY, JSON.stringify(WD)); } catch (e) { /* ignora */ } };
 const glassSvg = on => '<svg viewBox="0 0 24 30" width="26" height="33" aria-hidden="true"><path d="M3 2h18l-2.4 25a2 2 0 0 1-2 1.8H7.4a2 2 0 0 1-2-1.8Z" style="fill:var(--bg)"/>' +
-  (on ? '<path d="M3.9 10h16.2l-1.6 16.6a1 1 0 0 1-1 .9H6.5a1 1 0 0 1-1-.9Z" fill="#7CC4EE"/>' : '') +
+  (on ? '<path d="M3.9 10h16.2l-1.6 16.6a1 1 0 0 1-1 .9H6.5a1 1 0 0 1-1-.9Z" fill="#72C4F0"/>' : '') +
   '<path d="M3 2h18l-2.4 25a2 2 0 0 1-2 1.8H7.4a2 2 0 0 1-2-1.8Z" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/></svg>';
 function watHtml() {
   const n = WAT.n;
@@ -1258,7 +1263,7 @@ function watHtml() {
 }
 function wdChart() {
   if (!WD.length) return '';
-  const W = 320, H = 156, l = 36, r = 14, t = 12, b = 24;
+  const W = 640, H = 250, l = 46, r = 16, t = 16, b = 28;
   let w1 = NaN;
   try { const base = wlSim(1, state.target.k); w1 = base.pts[base.pts.length - 1]; } catch (e) { /* ignora */ }
   const ws = WD.map(x => x.w), all = ws.concat(isFinite(w1) ? [w1] : []);
@@ -1266,13 +1271,13 @@ function wdChart() {
   if (hi - lo < 2) { const m = (hi + lo) / 2; lo = m - 1; hi = m + 1; }
   const pad = (hi - lo) * 0.12; lo -= pad; hi += pad;
   const ts = WD.map(x => Date.parse(x.d + "T12:00:00")), t0 = ts[0], t1 = ts[ts.length - 1];
-  const X = i => WD.length < 2 || t1 === t0 ? l + (W - l - r) / 2 : l + (ts[i] - t0) / (t1 - t0) * (W - l - r);
+  const X = i => WD.length < 2 || t1 === t0 ? l + (W - l - r) / 2 : l + 12 + (ts[i] - t0) / (t1 - t0) * (W - l - r - 24);
   const Y = v => t + (hi - v) / (hi - lo) * (H - t - b);
   let s = '<svg class="wdsvg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Andamento del peso nel tempo">';
   [lo + pad, (lo + hi) / 2, hi - pad].forEach(v => { s += '<line x1="' + l + '" x2="' + (W - r) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '" style="stroke:var(--line)" stroke-width="1"/><text x="' + (l - 5) + '" y="' + (Y(v) + 3).toFixed(1) + '" text-anchor="end" class="wdt">' + r1(v) + '</text>'; });
   if (isFinite(w1)) s += '<line x1="' + l + '" x2="' + (W - r) + '" y1="' + Y(w1).toFixed(1) + '" y2="' + Y(w1).toFixed(1) + '" style="stroke:var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/><text x="' + (W - r) + '" y="' + (Y(w1) - 4).toFixed(1) + '" text-anchor="end" class="wdt">previsione ' + r1(w1) + ' kg</text>';
   s += '<polyline fill="none" style="stroke:var(--ink)" stroke-width="2" stroke-linejoin="round" points="' + WD.map((x, i) => X(i).toFixed(1) + ',' + Y(x.w).toFixed(1)).join(' ') + '"/>';
-  WD.forEach((x, i) => { s += '<circle cx="' + X(i).toFixed(1) + '" cy="' + Y(x.w).toFixed(1) + '" r="' + (WD.length > 40 ? 2.5 : 4) + '" style="fill:' + (i === WD.length - 1 ? 'var(--ink)' : 'var(--bg)') + ';stroke:var(--ink)" stroke-width="2"><title>' + fdate(x.d, true) + ': ' + r1(x.w) + ' kg</title></circle>'; });
+  WD.forEach((x, i) => { s += '<circle cx="' + X(i).toFixed(1) + '" cy="' + Y(x.w).toFixed(1) + '" r="' + (WD.length > 40 ? 3 : 5) + '" style="fill:' + (i === WD.length - 1 ? 'var(--ink)' : 'var(--bg)') + ';stroke:var(--ink)" stroke-width="2"><title>' + fdate(x.d, true) + ': ' + r1(x.w) + ' kg</title></circle>'; });
   s += '<text x="' + l + '" y="' + (H - 6) + '" class="wdt">' + fdate(WD[0].d) + '</text>' + (WD.length > 1 ? '<text x="' + (W - r) + '" y="' + (H - 6) + '" text-anchor="end" class="wdt">' + fdate(WD[WD.length - 1].d) + '</text>' : '');
   return s + '</svg>';
 }
@@ -1288,7 +1293,7 @@ function renderDiary() {
   let s = '';
   if (WD.length) {
     const f = WD[0], l = WD[WD.length - 1], dl = l.w - f.w;
-    s += '<p class="wlnote">' + (WD.length > 1 ? 'Dal ' + fdate(f.d, true) + ': da ' + r1(f.w) + ' a ' + r1(l.w) + ' kg (' + (dl > 0 ? '+' : dl < 0 ? '−' : '') + r1(Math.abs(dl)) + ' kg).' : 'Prima misura: ' + r1(f.w) + ' kg. Aggiungine altre per vedere l\'andamento.') + ' La linea tratteggiata è la previsione dell\'obiettivo.</p>' + wdChart();
+    s += '<p class="wlnote">' + (WD.length > 1 ? 'Dal ' + fdate(f.d, true) + ': da ' + r1(f.w) + ' a ' + r1(l.w) + ' kg (' + (dl > 0 ? '+' : dl < 0 ? '−' : '') + r1(Math.abs(dl)) + ' kg).' : 'Prima misura: ' + r1(f.w) + ' kg. Aggiungine altre per vedere l\'andamento.') + ' La linea tratteggiata è la previsione dell\'obiettivo.</p>' + wdChart() + (WD.length < 2 ? '<p class="hint">Aggiungi almeno due misure per vedere la linea dell\'andamento.</p>' : '');
     s += '<ul class="wdlist">' + WD.slice().reverse().slice(0, 8).map((x, j, arr) => {
       const idx = WD.length - 1 - j, p = WD[idx - 1], d = p ? x.w - p.w : null;
       return '<li><span>' + fdate(x.d, true) + '</span><b class="num">' + r1(x.w) + ' kg</b><span class="num wdd">' + (d == null ? '' : (d > 0 ? '+' : d < 0 ? '−' : '') + r1(Math.abs(d))) + '</span><button type="button" class="btn sm" data-act="wddel" data-d="' + x.d + '" aria-label="Elimina la misura del ' + fdate(x.d, true) + '">✕</button></li>';
@@ -1306,11 +1311,45 @@ function wdAdd() {
 }
 function wdSync() { if (WD.length) { WP.w = WD[WD.length - 1].w; wpSave(); } }
 
+/* liquido nell'avatar: superficie che oscilla piano, guidata dall'inclinazione del telefono (se disponibile) */
+const WS = { s: 0, v: 0, tgt: 0, t: 0, last: 0, sens: -9999, ph: Math.random() * 6.28 };
+function watPath(y, sl, t, ph) {
+  const amp = 1.1 + Math.min(3, Math.abs(WS.v) * 5);
+  let d = "";
+  for (let x = 0; x <= 200; x += 10) d += (x ? " L" : "M") + x + " " + (y + sl * (x - 100) + amp * Math.sin(x * 0.055 + t * 1.3 + ph)).toFixed(1);
+  return d + " V250 H0 Z";
+}
+function watLoop(ts) {
+  requestAnimationFrame(watLoop);
+  if (document.hidden || ts - WS.last < 33) return;
+  const els = document.querySelectorAll(".av-wp");
+  if (!els.length) { WS.last = ts; return; }
+  const dt = Math.min(0.1, (ts - WS.last) / 1000); WS.last = ts; WS.t += dt;
+  const sensor = performance.now() - WS.sens < 800;
+  const tgt = sensor ? WS.tgt : 0.05 * Math.sin(WS.t * 0.8 + WS.ph) + 0.03 * Math.sin(WS.t * 1.7 + WS.ph * 1.3);
+  WS.v += (14 * (tgt - WS.s) - 4.2 * WS.v) * dt; WS.s += WS.v * dt;
+  els.forEach(e => e.setAttribute("d", watPath(+e.dataset.y, WS.s, WS.t, WS.ph)));
+}
+try {
+  window.addEventListener("deviceorientation", ev => { if (ev.gamma == null) return; WS.tgt = Math.max(-0.45, Math.min(0.45, -Math.tan(ev.gamma * Math.PI / 180))); WS.sens = performance.now(); });
+  if (!window.matchMedia || !matchMedia("(prefers-reduced-motion: reduce)").matches) requestAnimationFrame(watLoop);
+} catch (e) { /* ignora */ }
+let WPERM = false;
+function watPerm() {
+  if (WPERM) return; WPERM = true;
+  try { if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function") DeviceOrientationEvent.requestPermission().catch(() => {}); } catch (e) { /* ignora */ }
+}
+function watHappy() {
+  const c = document.querySelector("#avres .avc"); if (!c) return;
+  c.classList.add("happy"); clearTimeout(watHappy.t); watHappy.t = setTimeout(() => c.classList.remove("happy"), 1500);
+}
+
 /* ---------- Dispensa: ricette possibili con gli alimenti che hai ---------- */
 const PTKEY = "ppl-pantry-v1";
-let PANTRY = [], PTMAX = 2, PTSORT = "m";
-try { const a = JSON.parse(localStorage.getItem(PTKEY)); if (a && Array.isArray(a.i)) { PANTRY = a.i.filter(x => typeof x === "string").map(x => x.slice(0, 50)).slice(0, 100); if (isFinite(a.m)) PTMAX = Math.max(0, Math.min(4, Math.round(a.m))); if (a.s === "p" || a.s === "k") PTSORT = a.s; } } catch (e) { /* nessun salvataggio */ }
-const ptSave = () => { try { localStorage.setItem(PTKEY, JSON.stringify({ i: PANTRY, m: PTMAX, s: PTSORT })); } catch (e) { /* ignora */ } };
+let PANTRY = [], PTMAX = 2, PTSORT = "m", PTVIEW = "have";
+const BK = { q: "", sel: [], any: false, sort: "t", lim: 60 };
+try { const a = JSON.parse(localStorage.getItem(PTKEY)); if (a && Array.isArray(a.i)) { PANTRY = a.i.filter(x => typeof x === "string").map(x => x.slice(0, 50)).slice(0, 100); if (isFinite(a.m)) PTMAX = Math.max(0, Math.min(4, Math.round(a.m))); if (a.s === "p" || a.s === "k") PTSORT = a.s; if (a.v === "book") PTVIEW = "book"; } } catch (e) { /* nessun salvataggio */ }
+const ptSave = () => { try { localStorage.setItem(PTKEY, JSON.stringify({ i: PANTRY, m: PTMAX, s: PTSORT, v: PTVIEW })); } catch (e) { /* ignora */ } };
 /* ingrediente generico: [etichetta, parole che lo riconoscono (inizio parola)] */
 const PI = {
   pasta: ["Pasta", ["pasta", "spaghetti", "penne", "fusilli", "rigatoni", "tagliatelle", "maccheroni", "farfalle", "linguine", "paccheri"]],
@@ -1513,6 +1552,29 @@ function ptHas(key) {
   return PANTRY.some(h => { const n = norm(h), tk = tokens(h); return words.some(w => w.slice(-1) === "$" ? tk.indexOf(w.slice(0, -1)) >= 0 : w.indexOf(" ") >= 0 || w.indexOf("'") >= 0 ? n.indexOf(w) >= 0 : tk.some(x => x.indexOf(w) === 0)); });
 }
 const PT_QUICK = ["Pasta", "Riso", "Uova", "Pomodori", "Cipolla", "Aglio", "Zucchine", "Patate", "Carote", "Spinaci", "Pollo", "Tonno", "Mozzarella", "Parmigiano", "Pane", "Yogurt", "Ceci", "Limone", "Banana", "Avena"];
+const mealOpts = () => '<option value="new">Nuovo pasto</option>' + state.meals.map(m => '<option value="' + m.id + '">' + esc(m.name) + '</option>').join("");
+function ptEval(r) { const have = [], miss = []; r.k.forEach(k => (ptHas(k) ? have : miss).push(PI[k][0])); return { r: r, have: have, miss: miss }; }
+function rcpCard(x, showMiss) {
+  const r = x.r, mc = r0(r.x.k) + ' kcal · P ' + r0(r.x.p) + ' g · C ' + r0(r.x.c) + ' g · G ' + r0(r.x.f) + ' g';
+  return '<details class="rcp"><summary><b>' + esc(r.t) + '</b> <span class="hint">' + r.m + ' min · ' + r0(r.x.k) + ' kcal · P ' + r0(r.x.p) + ' g</span>' + (showMiss ? '<div class="rcpm ' + (x.miss.length ? 'no' : 'ok') + '">' + (x.miss.length ? 'Manca: ' + esc(x.miss.join(', ')) : 'Hai tutto') + '</div>' : '') + '</summary><div class="rcpb"><p class="num">Per 1 porzione: ' + mc + '</p><p><b>Ingredienti:</b> ' + r.k.map(k => esc(PI[k][0]) + ' ' + r.g[k] + ' g').join(', ') + (r.o ? ', olio ' + r.o + ' g' : '') + '</p><p>' + esc(r.s) + '</p><div class="rcpadd"><select aria-label="Aggiungi a">' + mealOpts() + '</select><button type="button" class="btn sm pri" data-act="rcpadd" data-t="' + esc(r.t) + '">Aggiungi al piano</button></div></div></details>';
+}
+let BKK = null;
+function renderBook() {
+  if (!$("#bkres")) return;
+  if (!BKK) { const c = {}; RCP.forEach(r => r.k.forEach(k => { c[k] = (c[k] || 0) + 1; })); BKK = Object.keys(c).filter(k => PI[k]).sort((a, b) => PI[a][0].localeCompare(PI[b][0])).map(k => [k, c[k]]); }
+  $("#bkchips").innerHTML = BKK.map(x => '<button type="button" class="ptc" data-act="bkchip" data-k="' + x[0] + '" aria-pressed="' + (BK.sel.indexOf(x[0]) >= 0) + '">' + esc(PI[x[0]][0]) + ' <span class="hint">' + x[1] + '</span></button>').join("");
+  $("#bksum").textContent = "Filtra per ingredienti" + (BK.sel.length ? " (" + BK.sel.length + " scelti)" : "");
+  $("#bk_mode").value = BK.any ? "any" : "all"; $("#bk_sort").value = BK.sort;
+  renderBookRes();
+}
+function renderBookRes() {
+  const el = $("#bkres"); if (!el) return;
+  const q = norm(BK.q.trim());
+  const list = RCP.filter(r => (!q || norm(r.t).indexOf(q) >= 0) && (!BK.sel.length || (BK.any ? BK.sel.some(k => r.k.indexOf(k) >= 0) : BK.sel.every(k => r.k.indexOf(k) >= 0))));
+  if (BK.sort === "p") list.sort((a, b) => b.x.p - a.x.p); else if (BK.sort === "k") list.sort((a, b) => a.x.k - b.x.k); else if (BK.sort === "m") list.sort((a, b) => a.m - b.m || a.t.localeCompare(b.t)); else list.sort((a, b) => a.t.localeCompare(b.t));
+  const shown = list.slice(0, BK.lim);
+  el.innerHTML = '<h3>' + list.length + (list.length === 1 ? ' ricetta' : ' ricette') + '</h3>' + (list.length ? shown.map(r => rcpCard(ptEval(r), PANTRY.length > 0)).join("") : '<p class="hint">Nessuna ricetta corrisponde ai filtri.</p>') + (list.length > shown.length ? '<div class="dbq"><button type="button" class="btn sm" data-act="bkmore">Mostra altre ' + Math.min(60, list.length - shown.length) + '</button></div>' : '');
+}
 function ptResults() {
   const out = RCP.map(r => {
     const have = [], miss = [];
@@ -1530,18 +1592,22 @@ function renderPantry() {
   if (!el.querySelector("#ptres")) {
     const names = []; const seen = new Set();
     Object.keys(I).forEach(id => { const n = I[id].name.replace(/\s*\(.*?\)\s*/g, " ").trim(); if (n && !seen.has(n)) { seen.add(n); names.push(n); } });
-    el.innerHTML = '<h2>Dispensa</h2><p class="hint">Segna gli alimenti che hai in casa: ti propongo le ricette che puoi preparare e, se manca qualcosa, ti dico cosa. Si presumono sale, pepe, olio e acqua.</p>' +
+    el.innerHTML = '<h2>Dispensa</h2><div class="avsw ptview" role="group" aria-label="Vista"><button type="button" class="btn sm" data-act="ptview" data-v="have">Cosa posso cucinare</button><button type="button" class="btn sm" data-act="ptview" data-v="book">Ricettario</button></div><div class="dbstat" id="pt_msg" role="status"></div><div id="pt_have"><p class="hint">Segna gli alimenti che hai in casa: ti propongo le ricette che puoi preparare e, se manca qualcosa, ti dico cosa. Si presumono sale, pepe, olio e acqua.</p>' +
       '<div class="ptchips" id="ptchips"></div>' +
       '<div class="ptadd"><input type="text" id="pt_in" list="pt_dl" autocomplete="off" placeholder="Aggiungi un alimento (es. pasta, zucchine, tonno…)" aria-label="Aggiungi un alimento"><datalist id="pt_dl">' + names.map(n => '<option value="' + esc(n) + '">').join("") + '</datalist><button type="button" class="btn pri" data-act="ptadd">Aggiungi</button></div>' +
       '<div class="ptlist" id="ptlist"></div>' +
-      '<div class="ptctl"><label>Ingredienti mancanti ammessi <select id="pt_max"><option value="0">nessuno</option><option value="1">fino a 1</option><option value="2">fino a 2</option><option value="3">fino a 3</option><option value="4">fino a 4</option></select></label> <label>Ordina per <select id="pt_sort"><option value="m">ingredienti mancanti</option><option value="p">più proteine</option><option value="k">meno calorie</option></select></label></div><div class="dbstat" id="pt_msg" role="status"></div><div id="ptres"></div>';
+      '<div class="ptctl"><label>Ingredienti mancanti ammessi <select id="pt_max"><option value="0">nessuno</option><option value="1">fino a 1</option><option value="2">fino a 2</option><option value="3">fino a 3</option><option value="4">fino a 4</option></select></label> <label>Ordina per <select id="pt_sort"><option value="m">ingredienti mancanti</option><option value="p">più proteine</option><option value="k">meno calorie</option></select></label></div><div id="ptres"></div></div>' +
+      '<div id="pt_book" hidden><p class="hint">Tutte le ricette: cerca per nome o filtra per ingredienti.</p><input type="search" id="bk_q" class="bkq" autocomplete="off" placeholder="Cerca una ricetta…" aria-label="Cerca una ricetta"><details class="bkdet"><summary id="bksum"></summary><div class="ptchips" id="bkchips"></div></details>' +
+      '<div class="ptctl"><label>Deve contenere <select id="bk_mode"><option value="all">tutti gli ingredienti scelti</option><option value="any">almeno uno</option></select></label> <label>Ordina per <select id="bk_sort"><option value="t">nome</option><option value="p">più proteine</option><option value="k">meno calorie</option><option value="m">più veloci</option></select></label> <button type="button" class="btn sm" data-act="bkclear">Azzera filtri</button></div><div id="bkres"></div></div>';
     $("#pt_max").value = String(PTMAX); $("#pt_sort").value = PTSORT;
   }
   $("#ptchips").innerHTML = '<span class="hint">Aggiunta rapida:</span>' + PT_QUICK.map((n, i) => '<button type="button" class="ptc" data-act="ptchip" data-n="' + i + '" aria-pressed="' + PANTRY.some(h => norm(h) === norm(n)) + '">' + n + '</button>').join("");
   $("#ptlist").innerHTML = PANTRY.length ? PANTRY.map((h, i) => '<span class="ptag">' + esc(h) + '<button type="button" data-act="ptdel" data-i="' + i + '" aria-label="Rimuovi ' + esc(h) + '">✕</button></span>').join("") : '<p class="hint">La dispensa è vuota.</p>';
-  const res = ptResults(), shown = res.slice(0, 60), opts = '<option value="new">Nuovo pasto</option>' + state.meals.map(m => '<option value="' + m.id + '">' + esc(m.name) + '</option>').join("");
-  const mc = x => r0(x.r.x.k) + ' kcal · P ' + r0(x.r.x.p) + ' g · C ' + r0(x.r.x.c) + ' g · G ' + r0(x.r.x.f) + ' g';
-  $("#ptres").innerHTML = !PANTRY.length ? '' : res.length ? '<h3>' + res.length + (res.length === 1 ? ' ricetta possibile' : ' ricette possibili') + '</h3>' + shown.map(x => '<details class="rcp"><summary><b>' + esc(x.r.t) + '</b> <span class="hint">' + x.r.m + ' min · ' + r0(x.r.x.k) + ' kcal · P ' + r0(x.r.x.p) + ' g</span><div class="rcpm ' + (x.miss.length ? 'no' : 'ok') + '">' + (x.miss.length ? 'Manca: ' + esc(x.miss.join(', ')) : 'Hai tutto') + '</div></summary><div class="rcpb"><p class="num">Per 1 porzione: ' + mc(x) + '</p><p><b>Ingredienti:</b> ' + x.r.k.map(k => esc(PI[k][0]) + ' ' + x.r.g[k] + ' g').join(', ') + (x.r.o ? ', olio ' + x.r.o + ' g' : '') + '</p><p>' + esc(x.r.s) + '</p><div class="rcpadd"><select aria-label="Aggiungi a">' + opts + '</select><button type="button" class="btn sm pri" data-act="rcpadd" data-t="' + esc(x.r.t) + '">Aggiungi al piano</button></div></div></details>').join("") + (res.length > shown.length ? '<p class="wlnote">Mostro le prime ' + shown.length + ' su ' + res.length + ': riduci gli ingredienti mancanti ammessi per restringere.</p>' : '') : '<p class="hint">Nessuna ricetta con queste condizioni: aggiungi altri alimenti o consenti più ingredienti mancanti.</p>';
+  const res = ptResults(), shown = res.slice(0, 60);
+  $("#ptres").innerHTML = !PANTRY.length ? '' : res.length ? '<h3>' + res.length + (res.length === 1 ? ' ricetta possibile' : ' ricette possibili') + '</h3>' + shown.map(x => rcpCard(x, true)).join("") + (res.length > shown.length ? '<p class="wlnote">Mostro le prime ' + shown.length + ' su ' + res.length + ': riduci gli ingredienti mancanti ammessi per restringere.</p>' : '') : '<p class="hint">Nessuna ricetta con queste condizioni: aggiungi altri alimenti o consenti più ingredienti mancanti.</p>';
+  $("#pt_have").hidden = PTVIEW !== "have"; $("#pt_book").hidden = PTVIEW !== "book";
+  el.querySelectorAll("[data-act=ptview]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === PTVIEW)));
+  renderBook();
 }
 function ptAdd(name) {
   name = String(name || "").trim().slice(0, 50);
@@ -2519,13 +2585,17 @@ document.addEventListener("click", ev => {
   } else if (act === "scan") { scanStart();
   } else if (act === "avsex") { AVS = el.dataset.s === "f" ? "f" : "m"; WP.sex = AVS; wpSave(); const ss = document.querySelector("#wl select[data-k=sex]"); if (ss) ss.value = AVS; renderWLRes(); renderAvatar();
   } else if (act === "wat") {
-    watFix(); const n = Number(el.dataset.n); WAT.n = n === WAT.n ? n - 1 : n; watSave(); renderAvatar();
+    watFix(); watPerm(); const n = Number(el.dataset.n), up = n > WAT.n; WAT.n = n === WAT.n ? n - 1 : n; watSave(); renderAvatar(); if (up) watHappy();
   } else if (act === "wdadd") { wdAdd();
   } else if (act === "wddel") {
     WD = WD.filter(x => x.d !== el.dataset.d); wdSave(); wdSync(); renderDiary(); renderWLRes(); renderAvatar();
   } else if (act === "ptadd") { const i = $("#pt_in"); ptAdd(i.value); i.value = ""; i.focus();
   } else if (act === "ptchip") { const n = PT_QUICK[Number(el.dataset.n)], x = PANTRY.findIndex(h => norm(h) === norm(n)); if (x >= 0) PANTRY.splice(x, 1); else PANTRY.push(n); ptSave(); renderPantry();
   } else if (act === "rcpadd") { const sel = el.parentNode.querySelector("select"), msg = rcpAdd(el.dataset.t, sel ? sel.value : "new"); const mm = $("#pt_msg"); if (mm) mm.textContent = msg;
+  } else if (act === "ptview") { PTVIEW = el.dataset.v === "book" ? "book" : "have"; ptSave(); renderPantry();
+  } else if (act === "bkchip") { const k = el.dataset.k, i = BK.sel.indexOf(k); if (i >= 0) BK.sel.splice(i, 1); else BK.sel.push(k); BK.lim = 60; renderBook();
+  } else if (act === "bkclear") { BK.q = ""; BK.sel = []; BK.lim = 60; const q = $("#bk_q"); if (q) q.value = ""; renderBook();
+  } else if (act === "bkmore") { BK.lim += 60; renderBookRes();
   } else if (act === "ptdel") { PANTRY.splice(Number(el.dataset.i), 1); ptSave(); renderPantry();
   } else if (act === "bkmake") {
     const t = JSON.stringify(backupObject()); $("#bk_txt").value = t; bkMsg("Backup creato (" + (t.length / 1024).toFixed(1) + " KB).");
@@ -2660,8 +2730,11 @@ document.addEventListener("keydown", ev => {
   else if (ev.target.id === "wd_w") { ev.preventDefault(); wdAdd(); }
 });
 document.addEventListener("visibilitychange", () => { if (!document.hidden && watFix()) renderAvatar(); });
+document.addEventListener("input", ev => { if (ev.target && ev.target.id === "bk_q") { BK.q = ev.target.value; BK.lim = 60; renderBookRes(); } });
 document.addEventListener("change", ev => {
   if (ev.target && ev.target.id === "pt_max") { PTMAX = Number(ev.target.value) || 0; ptSave(); renderPantry(); return; }
+  if (ev.target && ev.target.id === "bk_mode") { BK.any = ev.target.value === "any"; BK.lim = 60; renderBookRes(); return; }
+  if (ev.target && ev.target.id === "bk_sort") { BK.sort = ev.target.value; renderBookRes(); return; }
   if (ev.target && ev.target.id === "pt_sort") { PTSORT = ev.target.value; ptSave(); renderPantry(); return; }
   const el = ev.target, a = el.dataset && el.dataset.act;
   if (el.id === "bk_file" && el.files && el.files[0]) {
