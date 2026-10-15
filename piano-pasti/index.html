@@ -171,17 +171,12 @@ h1{font-size:clamp(22px,3.2vw,30px)}
   #pv pre{white-space:pre-wrap;font:11px/1.45 Arial,Helvetica,sans-serif;margin:0}
   #pv .fine{margin-top:14px;color:#555;font-size:10px}
 }
-.av-fig{transform-box:view-box;transform-origin:100px 205px;animation:avbreath 3.6s ease-in-out infinite}
-.av-bob{transform-box:view-box;transform-origin:100px 100px;animation:avbob 4.4s ease-in-out infinite}
-.av-eyes{transform-box:view-box;transform-origin:100px 68px;animation:avblink 5.2s infinite}
-.avc:nth-child(2) .av-fig{animation-delay:-1.4s}.avc:nth-child(2) .av-bob{animation-delay:-2.1s}.avc:nth-child(2) .av-eyes{animation-delay:-2.6s}
-@keyframes avbreath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.01,1.016)}}
-@keyframes avbob{0%,100%{transform:rotate(-2.4deg)}50%{transform:rotate(2.4deg) translateY(-1px)}}
-@keyframes avblink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
-.avc{cursor:pointer;-webkit-tap-highlight-color:transparent}
-.avc.hop svg{animation:avhop .65s cubic-bezier(.3,.7,.4,1)}
-@keyframes avhop{0%{transform:translateY(0) scale(1,1)}20%{transform:translateY(0) scale(1.06,.93)}50%{transform:translateY(-16px) scale(.97,1.04)}80%{transform:translateY(0) scale(1.05,.94)}100%{transform:translateY(0) scale(1,1)}}
-@media (prefers-reduced-motion:reduce){.av-fig,.av-bob,.av-eyes,.avc.hop svg{animation:none}}
+.av-eyes{transform-box:view-box;transform-origin:100px 68px;animation:avblink 4.6s infinite}
+.av-hand{transform-box:fill-box;transform-origin:center;animation:avgrip 5.4s infinite}
+.avc:nth-child(2) .av-eyes{animation-delay:-2.1s}.avc:nth-child(2) .av-hand{animation-delay:-2.7s}
+@keyframes avblink{0%,91%,100%{transform:scaleY(1)}94%{transform:scaleY(.07)}}
+@keyframes avgrip{0%,55%,100%{transform:scale(1)}62%{transform:scale(.62)}70%{transform:scale(1)}78%{transform:scale(.62)}86%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.av-eyes,.av-hand{animation:none}}
 .ft-fb{font-size:11px;color:var(--muted);margin-top:4px}
 .wkbox{margin:0 0 18px;border-top:6px solid var(--rule);background:var(--surface);padding:12px 14px 16px}
 .wkbox h2{font-family:var(--font-display);font-stretch:125%;font-weight:850;text-transform:uppercase;font-size:22px;margin:0 0 4px;line-height:1}
@@ -395,8 +390,6 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;font-si
 }
 @media (max-width:430px){.dial .dv>span:last-child{display:none}.dial .dv{gap:2px}}
 </style>
-</head>
-<body>
 
 <div class="wrap">
   <header class="topbar">
@@ -769,11 +762,6 @@ function setTab(t, focus) {
   });
   try { localStorage.setItem("ppl-tab", t); } catch (e) { /* ignora */ }
 }
-document.addEventListener("click", ev => {
-  const c = ev.target.closest && ev.target.closest(".avc");
-  if (!c || c.classList.contains("hop")) return;
-  c.classList.add("hop"); setTimeout(() => c.classList.remove("hop"), 700);
-});
 document.addEventListener("keydown", ev => {
   const tb = ev.target.closest && ev.target.closest('[role="tab"]');
   if (!tb) return;
@@ -1135,7 +1123,7 @@ function avFig(sex, bmi, tone, label, cap, mod) {
     q += '<line stroke-width="' + (aw + e).toFixed(1) + '" x1="' + (cx - ax).toFixed(1) + '" y1="' + (ty + 6) + '" x2="' + (cx - hx).toFixed(1) + '" y2="' + (wy + 18) + '"/><line stroke-width="' + (aw + e).toFixed(1) + '" x1="' + (cx + ax).toFixed(1) + '" y1="' + (ty + 6) + '" x2="' + (cx + hx).toFixed(1) + '" y2="' + (wy + 18) + '"/>';
     q += '<line stroke-width="' + (14 + e) + '" x1="' + cx + '" y1="84" x2="' + cx + '" y2="' + (ty + 2) + '"/></g>';
     q += '<g fill="' + c + '" stroke="' + c + '" stroke-width="' + e + '">';
-    [-1, 1].forEach(k => { q += '<ellipse cx="' + (cx + k * (lx + 4)).toFixed(1) + '" cy="' + (ly + 2) + '" rx="' + (lw / 2 + 6).toFixed(1) + '" ry="5.5"/><circle cx="' + (cx + k * hx).toFixed(1) + '" cy="' + (wy + 21) + '" r="' + (aw / 2 + 1.5).toFixed(1) + '"/>'; });
+    [-1, 1].forEach(k => { q += '<ellipse cx="' + (cx + k * (lx + 4)).toFixed(1) + '" cy="' + (ly + 2) + '" rx="' + (lw / 2 + 6).toFixed(1) + '" ry="5.5"/><circle class="av-hand" cx="' + (cx + k * hx).toFixed(1) + '" cy="' + (wy + 21) + '" r="' + (aw / 2 + 1.5).toFixed(1) + '"/>'; });
     return q + '<path stroke-linejoin="round" d="' + torso + '"/></g>';
   };
   g += '<g class="av-fig">';
@@ -1154,7 +1142,7 @@ function avFig(sex, bmi, tone, label, cap, mod) {
     hd += '<path fill="var(--ink)" d="M' + P(-hw - 2, 62) + ' Q' + P(-hw - 6, 26) + ' ' + P(-24, 18) + ' Q' + P(-12, 2) + ' ' + P(10, 6) + ' Q' + P(34, 0) + ' ' + P(hw + 4, 30) + ' Q' + P(hw + 6, 48) + ' ' + P(hw + 2, 62) + ' Q' + P(hw - 2, 52) + ' ' + P(hw - 6, 44) + ' Q' + P(14, 36) + ' ' + P(-6, 38) + ' Q' + P(-22, 40) + ' ' + P(-hw + 6, 48) + ' Q' + P(-hw + 4, 56) + ' ' + P(-hw + 6, 62) + ' Q' + P(-hw + 2, 66) + ' ' + P(-hw - 2, 62) + ' Z"/>';
     hd += '<g fill="none" stroke="var(--bg)" stroke-width="2" stroke-linecap="round"><path d="M' + P(-22, 20) + ' Q' + P(-8, 12) + ' ' + P(8, 14) + '"/><path d="M' + P(-12, 28) + ' Q' + P(4, 20) + ' ' + P(24, 22) + '"/><path d="M' + P(-26, 36) + ' Q' + P(-6, 28) + ' ' + P(10, 32) + '"/><path d="M' + P(18, 12) + ' Q' + P(32, 18) + ' ' + P(36, 32) + '"/></g>';
   }
-  const eye = k => '<circle cx="' + (cx + k * 16) + '" cy="68" r="7" fill="var(--ink)"/><circle cx="' + (cx + k * 16 + 2.2) + '" cy="65.5" r="2.2" style="fill:var(--bg)"/>';
+  const eye = k => { const x = cx + k * 17; return '<ellipse cx="' + x + '" cy="68" rx="9" ry="10.5" fill="var(--ink)"/><circle cx="' + (x - 3) + '" cy="63.6" r="3.6" style="fill:var(--bg)"/><circle cx="' + (x + 3.2) + '" cy="72.6" r="1.7" style="fill:var(--bg)"/>'; };
   hd += '<g class="av-eyes">' + eye(-1) + eye(1) + '</g>';
   if (f) hd += '<g class="avs" stroke-width="2.2"><path d="M' + P(-24, 66) + ' l-4 1 M' + P(24, 66) + ' l4 1"/></g>';
   hd += '<ellipse cx="' + (cx - 27) + '" cy="82" rx="6" ry="3.6" style="fill:var(--line)"/><ellipse cx="' + (cx + 27) + '" cy="82" rx="6" ry="3.6" style="fill:var(--line)"/></g></g>';
