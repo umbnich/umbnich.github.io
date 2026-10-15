@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Piano Pasti</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap"></noscript>
 <style>
 /* Layout: tabella a 5 colonne (un pasto per colonna), righe libere, totale fissato in fondo a ogni colonna; sotto, valori del giorno e lista spesa */
 :root{
@@ -1322,7 +1322,7 @@ function watPath(y, sl, t, ph) {
 function watLoop(ts) {
   requestAnimationFrame(watLoop);
   if (document.hidden || ts - WS.last < 33) return;
-  const els = document.querySelectorAll(".av-wp");
+  const pn = document.getElementById("tab-avatar"), els = pn && !pn.hidden ? document.querySelectorAll(".av-wp") : [];
   if (!els.length) { WS.last = ts; return; }
   const dt = Math.min(0.1, (ts - WS.last) / 1000); WS.last = ts; WS.t += dt;
   const sensor = performance.now() - WS.sens < 800;
