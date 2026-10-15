@@ -420,6 +420,7 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;font-si
 .ptview{margin:8px 0}
 .bkq{width:100%;box-sizing:border-box;font:inherit;font-size:14px;color:var(--ink);padding:8px 10px;border:1.5px solid var(--rule);background:var(--bg);border-radius:0;margin:8px 0}
 .bkdet{margin:6px 0}.bkdet summary{cursor:pointer;font-weight:700;font-size:13px;padding:4px 0}
+.bkbar{position:fixed;left:8px;right:8px;bottom:8px;z-index:9000;background:var(--ink);color:var(--bg);padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;box-shadow:0 2px 10px rgba(0,0,0,.35)}.bkbar span{flex:1 1 220px}.bkbar .btn{background:var(--bg);color:var(--ink);border-color:var(--bg)}
 </style>
 
 <div class="wrap">
@@ -996,8 +997,8 @@ function backupObject() {
 function renderBackup() {
   const el = $("#bkd");
   if (!el) return;
-  el.innerHTML = '<summary>Backup e ripristino</summary><div class="dbbody bk"><p class="hint">I dati restano solo su questo dispositivo. Crea un backup per spostarli su un altro telefono o computer, poi incollalo lì e importalo.</p>' +
-    '<div class="dbq"><button type="button" class="btn sm pri" data-act="bkmake">Crea backup</button><button type="button" class="btn sm" data-act="bkcopy">Copia</button><button type="button" class="btn sm" data-act="bkfile">Scarica file</button><label class="btn sm" style="cursor:pointer">Carica file<input type="file" accept=".json,application/json" id="bk_file" hidden></label><button type="button" class="btn sm" data-act="bkimport">Importa dal testo</button></div>' +
+  el.innerHTML = '<summary>Backup e ripristino</summary><div class="dbbody bk"><p class="hint">I dati restano solo su questo dispositivo: se reinstalli l\'app li perdi. Salva un backup nei File (o nel tuo cloud) e, dopo la reinstallazione, ripristinalo con “Carica file” e “Importa”.</p><p class="hint" id="bk_last">' + bkLastTxt() + '</p>' +
+    '<div class="dbq"><button type="button" class="btn sm pri" data-act="bksave">Salva nei File</button><button type="button" class="btn sm" data-act="bkmake">Crea backup</button><button type="button" class="btn sm" data-act="bkcopy">Copia</button><button type="button" class="btn sm" data-act="bkfile">Scarica file</button><label class="btn sm" style="cursor:pointer">Carica file<input type="file" accept=".json,application/json" id="bk_file" hidden></label><button type="button" class="btn sm" data-act="bkimport">Importa dal testo</button></div>' +
     '<textarea id="bk_txt" spellcheck="false" aria-label="Testo del backup" placeholder="Qui compare il backup. Per ripristinare, incolla qui un backup e premi Importa."></textarea><div class="dbstat" id="bk_msg" role="status"></div></div>';
 }
 const bkMsg = t => { const e = $("#bk_msg"); if (e) e.textContent = t; };
@@ -1352,6 +1353,44 @@ function watPerm() {
 function watHappy() {
   const c = document.querySelector("#avres .avc"); if (!c) return;
   c.classList.add("happy"); clearTimeout(watHappy.t); watHappy.t = setTimeout(() => c.classList.remove("happy"), 1500);
+}
+
+/* ---------- Salvataggio nei File del telefono e promemoria ---------- */
+const LBK = "ppl-lastbk", FBK = "ppl-bkfirst", ABK = "ppl-bkask";
+const lsNum = k => { try { return Number(localStorage.getItem(k)) || 0; } catch (e) { return 0; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, String(v)); } catch (e) { /* ignora */ } };
+function bkLastTxt() {
+  const t = lsNum(LBK);
+  return t ? "Ultimo backup: " + new Date(t).toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" }) + "." : "Non hai ancora salvato un backup da questa app.";
+}
+function bkDone(msg) {
+  lsSet(LBK, Date.now());
+  const l = $("#bk_last"); if (l) l.textContent = bkLastTxt();
+  const b = $("#bkbar"); if (b) b.remove();
+  bkMsg(msg);
+}
+async function bkSave() {
+  const txt = JSON.stringify(backupObject()), name = "piano-pasti-backup-" + todayStr() + ".json";
+  try {
+    const f = new File([txt], name, { type: "application/json" });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: "Backup Piano Pasti" }); bkDone("Backup pronto: nel menu scegli “Salva su File” (o il tuo cloud) per tenerlo fuori dall'app."); return; }
+  } catch (e) { if (e && e.name === "AbortError") return; }
+  try {
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt], { type: "application/json" })); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove(); bkDone("Backup scaricato come file: conservalo fuori dall'app (File, Drive…).");
+  } catch (e) { bkMsg("Salvataggio non disponibile qui: usa Copia e incolla il testo in una nota."); }
+}
+function bkRemind() {
+  try {
+    if (!localStorage.getItem(KEY) || document.getElementById("bkbar")) return;
+    const now = Date.now(); let first = lsNum(FBK); if (!first) { lsSet(FBK, now); first = now; }
+    const last = Math.max(lsNum(LBK), first), ask = lsNum(ABK);
+    if (now - last < 7 * 864e5 || now - ask < 7 * 864e5) return;
+    const d = Math.floor((now - last) / 864e5), b = document.createElement("div");
+    b.id = "bkbar"; b.className = "bkbar"; b.setAttribute("role", "region"); b.setAttribute("aria-label", "Promemoria backup");
+    b.innerHTML = '<span>' + (lsNum(LBK) ? 'Ultimo backup ' + d + ' giorni fa.' : 'Non hai ancora fatto un backup.') + ' Se reinstalli l\'app i dati vanno persi.</span><button type="button" class="btn sm" data-act="bksave">Salva ora</button><button type="button" class="btn sm" data-act="bklater">Più tardi</button>';
+    document.body.appendChild(b);
+  } catch (e) { /* ignora */ }
 }
 
 /* ---------- Dispensa: ricette possibili con gli alimenti che hai ---------- */
@@ -2606,6 +2645,8 @@ document.addEventListener("click", ev => {
   } else if (act === "bkchip") { const k = el.dataset.k, i = BK.sel.indexOf(k); if (i >= 0) BK.sel.splice(i, 1); else BK.sel.push(k); BK.lim = 60; renderBook();
   } else if (act === "bkclear") { BK.q = ""; BK.sel = []; BK.lim = 60; const q = $("#bk_q"); if (q) q.value = ""; renderBook();
   } else if (act === "bkmore") { BK.lim += 60; renderBookRes();
+  } else if (act === "bksave") { bkSave();
+  } else if (act === "bklater") { lsSet(ABK, Date.now()); const b = $("#bkbar"); if (b) b.remove();
   } else if (act === "ptdel") { PANTRY.splice(Number(el.dataset.i), 1); ptSave(); renderPantry();
   } else if (act === "bkmake") {
     const t = JSON.stringify(backupObject()); $("#bk_txt").value = t; bkMsg("Backup creato (" + (t.length / 1024).toFixed(1) + " KB).");
@@ -2820,6 +2861,8 @@ function copyList(btn) {
 
 [renderTargets, renderCustom, renderTargets, renderGenPanel, renderOff, renderTpl, renderPdf, renderBackup, renderPantry, renderWL, renderDays, renderCols, refreshNums].forEach(f => { try { f(); } catch (e) { window.__err(e, f.name); } });
 setTimeout(() => { offRefresh(false); }, 2500);
+setTimeout(bkRemind, 3500);
+try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* ignora */ }
 try { const tb = localStorage.getItem("ppl-tab"); if (tb === "shop" || tb === "pantry" || tb === "prep" || tb === "week" || tb === "avatar") setTab(tb); } catch (e) { /* ignora */ }
 /* le schede restano sotto la barra fissa degli obiettivi: ne misuro l'altezza */
 try {
