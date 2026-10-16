@@ -1086,6 +1086,7 @@ function renderWeek() {
 }
 
 const WMETS = [["Camminata veloce", 3.8], ["Corsa", 9], ["Palestra con i pesi", 5], ["Nuoto", 7], ["Ciclismo", 7.5], ["Allenamento intenso (HIIT)", 8.5], ["Nessun allenamento", 1]];
+let AVS = "m", AVW = 0;
 const WP = { sex: "m", age: 30, h: 175, w: 75, base: 1.2, sess: 3, mins: 60, met: 5, bmrMode: "calc", src: "plan", manual: 1900, weeks: 8 };
 try { const o = JSON.parse(localStorage.getItem(PKEY)); if (o && typeof o === "object") Object.keys(WP).forEach(k => { if (o[k] != null && (typeof o[k] === typeof WP[k])) WP[k] = o[k]; }); } catch (e) { /* ignora */ }
 if (WP.sex === "f") AVS = "f";
@@ -1151,7 +1152,7 @@ function renderWL() {
 }
 
 /* ---------- Avatar (omino originale, altezza fissa, sagoma in funzione del BMI) ---------- */
-let AVS = "m", AVW = 0;
+/* AVS e AVW sono dichiarati prima di WP */
 function avFig(sex, bmi, tone, label, cap, mod, water) {
   mod = mod || { sh: 0, wa: 0 };
   const s = Math.max(0, Math.min(1.25, (bmi - 17) / 17)), t = Math.max(0, Math.min(1, tone)), f = sex === "f", cx = 100;
