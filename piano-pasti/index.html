@@ -421,6 +421,16 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;font-si
 .bkq{width:100%;box-sizing:border-box;font:inherit;font-size:14px;color:var(--ink);padding:8px 10px;border:1.5px solid var(--rule);background:var(--bg);border-radius:0;margin:8px 0}
 .bkdet{margin:6px 0}.bkdet summary{cursor:pointer;font-weight:700;font-size:13px;padding:4px 0}
 .bkbar{position:fixed;left:8px;right:8px;bottom:8px;z-index:9000;background:var(--ink);color:var(--bg);padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;box-shadow:0 2px 10px rgba(0,0,0,.35)}.bkbar span{flex:1 1 220px}.bkbar .btn{background:var(--bg);color:var(--ink);border-color:var(--bg)}
+.ofbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-end;border:1.5px solid var(--line);padding:8px 10px;margin:8px 0 12px;font-size:13px}
+.ofbar label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);font-weight:600}
+.ofbar input,.ofbar select,.off input{font:inherit;font-size:13px;color:var(--ink);padding:5px 8px;border:1.5px solid var(--rule);background:var(--bg);border-radius:0;min-width:0}
+.ofbar .hint{flex:1 1 100%}
+.li .ofr{grid-column:2 / -1;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:3px}
+.li .ofr .btn{font-size:12px;padding:3px 9px;text-decoration:none;color:var(--ink)}
+.li .ofr a.btn:visited{color:var(--ink)}
+.ofn{font-size:12px;font-weight:700;color:var(--accent)}.ofn.exp{color:var(--muted);text-decoration:line-through}
+.off{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.off input{flex:1 1 130px}
+.li.done .ofr{opacity:.6}
 </style>
 
 <div class="wrap">
@@ -992,7 +1002,7 @@ function renderTpl() {
 const PKEY = "ppl-profile-v1";
 function backupObject() {
   const g = k => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
-  return { app: "piano-pasti", v: 1, saved: new Date().toISOString(), menu: g(KEY), custom: g(CKEY), off: g(OKEY), tpl: g(TKEY), profile: g(PKEY), bought: g(BKEY), diary: g(DKEY), pantry: g(PTKEY) };
+  return { app: "piano-pasti", v: 1, saved: new Date().toISOString(), menu: g(KEY), custom: g(CKEY), off: g(OKEY), tpl: g(TKEY), profile: g(PKEY), bought: g(BKEY), diary: g(DKEY), pantry: g(PTKEY), offers: g(OKEY2) };
 }
 function renderBackup() {
   const el = $("#bkd");
@@ -1016,6 +1026,7 @@ function bkImport() {
     if (Array.isArray(o.bought)) put(BKEY, o.bought);
     if (Array.isArray(o.diary)) put(DKEY, o.diary);
     if (o.pantry && Array.isArray(o.pantry.i)) put(PTKEY, o.pantry);
+    if (o.offers && typeof o.offers === "object") put(OKEY2, o.offers);
   } catch (e) { bkMsg("Impossibile scrivere i dati in questo browser."); return; }
   bkMsg("Backup importato: ricarico la pagina…");
   setTimeout(() => location.reload(), 600);
@@ -1942,6 +1953,34 @@ function renderDash() {
     box.setAttribute("role", "img"); box.setAttribute("aria-label", x[1] + ": " + r0(v) + " di " + r0(tg) + " " + x[2]);
   });
 }
+/* ---------- Offerte: ricerca volantini e note su dove hai visto il prodotto in offerta ---------- */
+const OKEY2 = "ppl-offers-v1";
+let OFR = { city: "", src: "g", notes: {} }, OFROPEN = null;
+try { const o = JSON.parse(localStorage.getItem(OKEY2)); if (o && typeof o === "object") { OFR.city = String(o.city || "").slice(0, 40); if (o.src === "d" || o.src === "p" || o.src === "g") OFR.src = o.src; if (o.notes && typeof o.notes === "object") Object.keys(o.notes).slice(0, 300).forEach(k => { const x = o.notes[k]; if (x && typeof x.s === "string") OFR.notes[k] = { s: x.s.slice(0, 40), p: String(x.p || "").slice(0, 20), u: /^\d{4}-\d{2}-\d{2}$/.test(x.u || "") ? x.u : "" }; }); } } catch (e) { /* nessun salvataggio */ }
+const ofrSave = () => { try { localStorage.setItem(OKEY2, JSON.stringify(OFR)); } catch (e) { /* ignora */ } };
+function ofrTerm(n) { return String(n).replace(/\([^)]*\)/g, " ").split("/")[0].replace(/senza lattosio|delattosat\w*|surgelat\w*/gi, " ").replace(/\s+/g, " ").trim().split(" ").slice(0, 5).join(" ").toLowerCase(); }
+function ofrUrl(n, g) {
+  const t = ofrTerm(g || n), c = OFR.city.trim(), site = OFR.src === "d" ? " site:doveconviene.it" : OFR.src === "p" ? " site:promoqui.it" : "";
+  return "https://www.google.com/search?q=" + encodeURIComponent("offerte " + t + " volantino supermercato" + (c ? " " + c : "") + site);
+}
+function ofrBar() {
+  return '<div class="ofbar"><b>Offerte</b><label>Città o CAP <input type="text" id="of_city" maxlength="40" value="' + esc(OFR.city) + '" placeholder="es. Cosenza" autocomplete="off"></label><label>Cerca su <select id="of_src"><option value="g"' + (OFR.src === "g" ? " selected" : "") + '>Google (tutti i volantini)</option><option value="d"' + (OFR.src === "d" ? " selected" : "") + '>Doveconviene</option><option value="p"' + (OFR.src === "p" ? " selected" : "") + '>Promoqui</option></select></label><span class="hint">Il tasto “Cerca offerte” apre la ricerca nel browser; poi annota dove hai visto lo sconto.</span></div>';
+}
+function ofrRow(name, gen) {
+  const x = OFR.notes[name], exp = x && x.u && x.u < todayStr();
+  let h = '<div class="ofr"><a class="btn sm" target="_blank" rel="noopener" href="' + esc(ofrUrl(name, gen)) + '">Cerca offerte</a> ';
+  if (x) h += '<span class="ofn' + (exp ? ' exp' : '') + '">' + esc(x.s) + (x.p ? ' · ' + esc(x.p) : '') + (x.u ? ' · fino al ' + fdate(x.u, true) : '') + (exp ? ' (scaduta)' : '') + '</span><button type="button" class="btn sm" data-act="ofedit" data-n="' + esc(name) + '">Modifica</button><button type="button" class="btn sm" data-act="ofdel" data-n="' + esc(name) + '" aria-label="Elimina la nota">✕</button>';
+  else h += '<button type="button" class="btn sm" data-act="ofedit" data-n="' + esc(name) + '">Annota dove l\'ho visto</button>';
+  if (OFROPEN === name) h += '<div class="off"><input type="text" class="of_s" maxlength="40" placeholder="Supermercato (es. Conad)" value="' + esc(x ? x.s : "") + '" aria-label="Supermercato"><input type="text" class="of_p" maxlength="20" placeholder="Prezzo (es. 5,99 €/kg)" value="' + esc(x ? x.p : "") + '" aria-label="Prezzo"><input type="date" class="of_u" value="' + esc(x ? x.u : "") + '" aria-label="Valida fino al"><button type="button" class="btn sm pri" data-act="ofsave" data-n="' + esc(name) + '">Salva</button><button type="button" class="btn sm" data-act="ofcancel">Annulla</button></div>';
+  return h + '</div>';
+}
+function ofrSaveNote(name, box) {
+  const s = (box.querySelector(".of_s").value || "").trim(), p = (box.querySelector(".of_p").value || "").trim(), u = box.querySelector(".of_u").value || "";
+  if (!s) { box.querySelector(".of_s").focus(); return; }
+  OFR.notes[name] = { s: s.slice(0, 40), p: p.slice(0, 20), u: /^\d{4}-\d{2}-\d{2}$/.test(u) ? u : "" };
+  OFROPEN = null; ofrSave(); renderBelow();
+}
+
 function renderBelow() {
   renderDash();
   let tot = zero();
@@ -1961,7 +2000,7 @@ function renderBelow() {
   const secs = shopping();
   window.__shop = secs;
   let h = '<div class="shop"><div class="sh"><h3>Lista della spesa</h3><span class="hint">per ' + state.plan.length + (state.plan.length === 1 ? ' giorno' : ' giorni') + '</span></div>';
-  h += '<div class="secs">';
+  h += ofrBar() + '<div class="secs">';
   SEC_ORDER.forEach(s => {
     if (!secs[s]) return;
     h += '<div class="sec"><h4>' + s + '</h4>';
@@ -1972,7 +2011,7 @@ function renderBelow() {
       else if (l.u !== "uova") q = "≈ " + r0(v.need) + " g";
       const need = l.u === "uova" ? "servono " + Math.ceil(v.need - 0.001) + " uova" : "servono " + r0(v.need) + " g";
       const dn = BOUGHT.has(l.n);
-      h += '<div class="li' + (dn ? ' done' : '') + '"><input type="checkbox" class="bk" data-act="bought" data-n="' + esc(l.n) + '" aria-label="Comprato: ' + esc(l.n) + '"' + (dn ? ' checked' : '') + '><div class="n">' + l.n + (l.lf ? '<span class="lf">senza lattosio</span>' : "") + '</div><div class="q">' + q + '</div><div class="d">' + need + " · " + v.items.join(", ") + '</div></div>';
+      h += '<div class="li' + (dn ? ' done' : '') + '"><input type="checkbox" class="bk" data-act="bought" data-n="' + esc(l.n) + '" aria-label="Comprato: ' + esc(l.n) + '"' + (dn ? ' checked' : '') + '><div class="n">' + l.n + (l.lf ? '<span class="lf">senza lattosio</span>' : "") + '</div><div class="q">' + q + '</div><div class="d">' + need + " · " + v.items.join(", ") + '</div>' + ofrRow(l.n, v.items && v.items[0]) + '</div>';
     });
     h += '</div>';
   });
@@ -2774,6 +2813,10 @@ document.addEventListener("click", ev => {
     state.meals = exampleMeals();
     renderCols(); refreshNums();
   } else if (act === "copy") { copyList(el);
+  } else if (act === "ofedit") { OFROPEN = el.dataset.n; renderBelow(); const f = document.querySelector(".off .of_s"); if (f) f.focus();
+  } else if (act === "ofcancel") { OFROPEN = null; renderBelow();
+  } else if (act === "ofsave") { const b = el.closest(".off"); if (b) ofrSaveNote(el.dataset.n, b);
+  } else if (act === "ofdel") { delete OFR.notes[el.dataset.n]; ofrSave(); renderBelow();
   } else if (act === "boughtclear") { BOUGHT.clear(); boughtSave(); renderBelow(); }
 });
 document.addEventListener("keydown", ev => {
@@ -2784,6 +2827,8 @@ document.addEventListener("keydown", ev => {
 document.addEventListener("visibilitychange", () => { if (!document.hidden && watFix()) renderAvatar(); });
 document.addEventListener("input", ev => { if (ev.target && ev.target.id === "bk_q") { BK.q = ev.target.value; BK.lim = 60; renderBookRes(); } });
 document.addEventListener("change", ev => {
+  if (ev.target && ev.target.id === "of_src") { OFR.src = ev.target.value; ofrSave(); renderBelow(); return; }
+  if (ev.target && ev.target.id === "of_city") { OFR.city = ev.target.value.trim().slice(0, 40); ofrSave(); renderBelow(); return; }
   if (ev.target && ev.target.id === "pt_max") { PTMAX = Number(ev.target.value) || 0; ptSave(); renderPantry(); return; }
   if (ev.target && ev.target.id === "bk_mode") { BK.any = ev.target.value === "any"; BK.lim = 60; renderBookRes(); return; }
   if (ev.target && ev.target.id === "bk_sort") { BK.sort = ev.target.value; renderBookRes(); return; }
