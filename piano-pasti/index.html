@@ -10,6 +10,7 @@
 <title>Piano Pasti</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap"></noscript>
+<script>try{var t=localStorage.getItem("ppl-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <style>
 /* Layout: tabella a 5 colonne (un pasto per colonna), righe libere, totale fissato in fondo a ogni colonna; sotto, valori del giorno e lista spesa */
 :root{
@@ -478,7 +479,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 <div class="wrap">
   <header class="topbar">
     <div class="ttl"><h1>Piano Pasti</h1><small id="dayCap">Giorno 1</small></div>
-    <span class="hgrp" role="group" aria-label="Cronologia"><button type="button" class="btn sm" data-act="undo" title="Annulla l'ultima modifica (Ctrl+Z)" disabled>&#8630; Annulla</button><button type="button" class="btn sm" data-act="redo" title="Ripeti (Ctrl+Maiusc+Z)" disabled>Ripeti &#8631;</button></span>
+    <span class="hgrp" role="group" aria-label="Cronologia"><button type="button" class="btn sm" data-act="theme" id="themeBtn" title="Passa tra tema chiaro e scuro" aria-label="Cambia tema">&#9680; Tema</button><button type="button" class="btn sm" data-act="undo" title="Annulla l'ultima modifica (Ctrl+Z)" disabled>&#8630; Annulla</button><button type="button" class="btn sm" data-act="redo" title="Ripeti (Ctrl+Maiusc+Z)" disabled>Ripeti &#8631;</button></span>
   </header>
 
   <div class="stick" id="stick"><div class="mini num" id="mini" aria-hidden="true"></div></div>
@@ -2839,6 +2840,10 @@ document.addEventListener("click", ev => {
     }
   } else if (act === "tab") {
     setTab(el.dataset.t);
+  } else if (act === "theme") {
+    const d = document.documentElement, cur = d.getAttribute("data-theme") || (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"), nx = cur === "dark" ? "light" : "dark";
+    d.setAttribute("data-theme", nx);
+    try { localStorage.setItem("ppl-theme", nx); } catch (e) { /* ignora */ }
   } else if (act === "undo") { doUndo();
   } else if (act === "redo") { doRedo();
   } else if (act === "copyprep") {
