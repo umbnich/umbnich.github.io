@@ -286,7 +286,7 @@ h1{font-size:clamp(22px,3.2vw,30px)}
 .dcard ul{margin:0;padding-left:16px}
 .dcard li{margin:1px 0;overflow-wrap:anywhere}
 /* menu a tendina con ricerca */
-#pop{position:fixed;z-index:60;background:var(--surface);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow);overflow-y:auto;overscroll-behavior:contain}
+#pop{position:fixed;z-index:70;background:var(--surface);color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow);overflow-y:auto;overscroll-behavior:contain}
 .opt{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:2px 8px;padding:7px 10px;border-bottom:1px solid var(--line);cursor:pointer}
 .opt:hover,.opt[aria-selected="true"]{background:var(--sel-bg);color:var(--sel-ink)}
 .opt .on{flex:1 1 0;min-width:0;font-weight:600;font-size:14px;overflow-wrap:break-word}
@@ -2539,19 +2539,27 @@ function drawList() {
   ac.input.setAttribute("aria-activedescendant", ac.items.length ? "o" + ac.active : "");
   place();
 }
+function vpBox() {
+  const vv = window.visualViewport, nav = document.querySelector(".bnav");
+  const vh = vv ? vv.height : window.innerHeight, vt = vv ? vv.offsetTop : 0;
+  const kb = vv ? window.innerHeight - vv.height - vv.offsetTop > 120 : false;   // tastiera aperta: la barra in basso e' coperta
+  return { top: vt, bottom: vt + vh - (kb || !nav ? 0 : nav.offsetHeight), vw: window.innerWidth, vh: window.innerHeight };
+}
 function place() {
   if (!ac.input || pop.hidden) return;
-  const r = ac.input.getBoundingClientRect(), vh = window.innerHeight, vw = window.innerWidth;
-  const w = Math.min(Math.max(r.width, 300), vw - 16), left = Math.min(Math.max(8, r.left), vw - w - 8);
-  const below = vh - r.bottom - 8, above = r.top - 8;
+  const r = ac.input.getBoundingClientRect(), V = vpBox();
+  const w = Math.min(Math.max(r.width, 300), V.vw - 16), left = Math.min(Math.max(8, r.left), V.vw - w - 8);
+  const below = V.bottom - r.bottom - 8, above = r.top - V.top - 8;
   pop.style.width = w + "px"; pop.style.left = left + "px";
-  if (below >= 220 || below >= above) { pop.style.top = (r.bottom + 2) + "px"; pop.style.bottom = "auto"; pop.style.maxHeight = Math.max(120, Math.min(320, below)) + "px"; }
-  else { pop.style.bottom = (vh - r.top + 2) + "px"; pop.style.top = "auto"; pop.style.maxHeight = Math.max(120, Math.min(320, above)) + "px"; }
+  if (below >= 180 || below >= above) { pop.style.top = (r.bottom + 2) + "px"; pop.style.bottom = "auto"; pop.style.maxHeight = Math.max(100, Math.min(320, below)) + "px"; }
+  else { pop.style.bottom = (V.vh - r.top + 2) + "px"; pop.style.top = "auto"; pop.style.maxHeight = Math.max(100, Math.min(320, above)) + "px"; }
 }
 function openPop(input) {
   ac = { input: input, col: input.dataset.col, i: Number(input.dataset.i), items: [], active: 0, dirty: false };
   pop.hidden = false;
   input.setAttribute("aria-expanded", "true");
+  const r = input.getBoundingClientRect(), V = vpBox();
+  if (r.top < V.top + 60 || V.bottom - r.bottom < 200) { try { window.scrollBy(0, r.top - (V.top + 90)); } catch (e) { /* ignora */ } }   // porta il campo in alto con spazio sotto per l'elenco
   buildList();
 }
 function closePop(restore) {
@@ -2659,6 +2667,7 @@ pop.addEventListener("click", ev => {
   if (o && ac.items[Number(o.dataset.i)]) pick(ac.items[Number(o.dataset.i)]);
 });
 window.addEventListener("resize", place);
+if (window.visualViewport) { visualViewport.addEventListener("resize", place); visualViewport.addEventListener("scroll", place); }
 window.addEventListener("scroll", place, true);
 
 document.addEventListener("click", ev => {
