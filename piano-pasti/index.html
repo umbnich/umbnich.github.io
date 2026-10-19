@@ -475,6 +475,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .morebtn:hover{border-color:var(--accent)}
 .backb{margin-bottom:10px}
 html,body{touch-action:pan-x pan-y}
+@media (pointer:coarse){input,select,textarea{font-size:16px!important}}   /* iOS ingrandisce la pagina se il campo ha meno di 16px */
+#sfp{position:fixed;top:0;left:0;width:0;height:0;padding-top:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none}
 .clipbar{background:var(--surface);border:1.5px dashed var(--accent);padding:8px 12px;margin:10px 0 0;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:13px}
 .clipbar[hidden]{display:none}
 .clipbar b{font-weight:700}
@@ -568,7 +570,7 @@ html,body{touch-action:pan-x pan-y}
 </nav>
 </div>
 <div id="pv" aria-hidden="true"></div>
-<div id="pop" role="listbox" id="pop" hidden></div>
+<div id="pop" role="listbox" id="pop" hidden></div><div id="sfp" aria-hidden="true"></div>
 
 <script>
 /* segnalatore errori: se qualcosa si rompe all'avvio lo mostra a schermo invece di lasciare la pagina vuota */
@@ -2570,19 +2572,26 @@ function drawList() {
   place();
 }
 function vpBox() {
-  const vv = window.visualViewport, nav = document.querySelector(".bnav");
+  const vv = window.visualViewport, nav = document.querySelector(".bnav"), sf = document.getElementById("sfp");
   const vh = vv ? vv.height : window.innerHeight, vt = vv ? vv.offsetTop : 0;
   const kb = vv ? window.innerHeight - vv.height - vv.offsetTop > 120 : false;   // tastiera aperta: la barra in basso e' coperta
-  return { top: vt, bottom: vt + vh - (kb || !nav ? 0 : nav.offsetHeight), vw: window.innerWidth, vh: window.innerHeight };
+  const st = sf ? sf.offsetHeight || parseFloat(getComputedStyle(sf).paddingTop) || 0 : 0;   // area sotto la barra di stato
+  return { top: vt + st, bottom: vt + vh - (kb || !nav ? 0 : nav.offsetHeight), vw: window.innerWidth, vh: window.innerHeight };
 }
 function place() {
   if (!ac.input || pop.hidden) return;
-  const r = ac.input.getBoundingClientRect(), V = vpBox();
+  let r = ac.input.getBoundingClientRect(), V = vpBox();
+  let below = V.bottom - r.bottom - 8;
+  if (!ac.fixed && below < 180) {   // poco spazio sotto (es. tastiera aperta): porta il campo in alto una sola volta
+    ac.fixed = true;
+    try { window.scrollBy(0, r.top - (V.top + 70)); } catch (e) { /* ignora */ }
+    r = ac.input.getBoundingClientRect(); V = vpBox(); below = V.bottom - r.bottom - 8;
+  }
+  const above = r.top - V.top - 8;
   const w = Math.min(Math.max(r.width, 300), V.vw - 16), left = Math.min(Math.max(8, r.left), V.vw - w - 8);
-  const below = V.bottom - r.bottom - 8, above = r.top - V.top - 8;
-  pop.style.width = w + "px"; pop.style.left = left + "px";
-  if (below >= 180 || below >= above) { pop.style.top = (r.bottom + 2) + "px"; pop.style.bottom = "auto"; pop.style.maxHeight = Math.max(100, Math.min(320, below)) + "px"; }
-  else { pop.style.bottom = (V.vh - r.top + 2) + "px"; pop.style.top = "auto"; pop.style.maxHeight = Math.max(100, Math.min(320, above)) + "px"; }
+  pop.style.width = w + "px"; pop.style.left = left + "px"; pop.style.bottom = "auto";
+  if (below >= 180 || below >= above) { const h = Math.max(100, Math.min(320, below)); pop.style.top = (r.bottom + 2) + "px"; pop.style.maxHeight = h + "px"; }
+  else { const h = Math.max(100, Math.min(320, above)); pop.style.maxHeight = h + "px"; pop.style.top = Math.max(V.top + 4, r.top - 2 - Math.min(h, pop.scrollHeight)) + "px"; }
 }
 function openPop(input) {
   ac = { input: input, col: input.dataset.col, i: Number(input.dataset.i), items: [], active: 0, dirty: false };
