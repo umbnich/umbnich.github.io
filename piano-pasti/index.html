@@ -97,7 +97,7 @@ h1{font-size:clamp(22px,3.2vw,30px)}
 .hgrp{display:inline-flex;gap:6px;margin-left:8px;padding-left:12px;border-left:2px solid var(--line)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .btn:disabled:hover{background:var(--surface);border-color:var(--ink);color:inherit}
-.topbar{position:sticky;top:0;z-index:40;background:var(--bg);display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px 16px;align-items:center;border-bottom:4px solid var(--rule);padding:6px 0 4px}
+.topbar{position:sticky;top:0;z-index:40;background:var(--bg);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 16px;align-items:center;border-bottom:4px solid var(--rule);padding:6px 0 4px}
 .ttl small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
 .dash{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 10px;align-items:start}
 .dial{text-align:center;min-width:0}
@@ -431,28 +431,63 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;font-si
 .ofn{font-size:12px;font-weight:700;color:var(--accent)}.ofn.exp{color:var(--muted);text-decoration:line-through}
 .off{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.off input{flex:1 1 130px}
 .li.done .ofr{opacity:.6}
+
+/* ---- diario ---- */
+.cols{flex-direction:column;gap:12px;align-items:stretch}
+.tablewrap{background:transparent;overflow:visible;scroll-snap-type:none}
+.col{flex:none;min-width:0;max-width:none;width:100%;border:1.5px solid var(--line);border-left:6px solid var(--mc);background:var(--surface)}
+.ch{border-bottom:1px solid var(--line)}
+.ft{border-top:1px solid var(--line)}
+.newcol{flex:none;padding:0}
+.newcol .add{padding:12px;margin:0}
+.x.alt{color:var(--accent);border-color:var(--accent);width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center}
+.x.alt svg{width:18px;height:18px}
+.x.alt:hover{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.r3{font-size:12.5px}
+.stick{position:static}
+.mini{display:none!important}
+body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+.bnav{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;background:var(--surface);border-top:2px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.bnav [role=tab]{flex:1;border:0;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:7px 2px 6px;font-size:11px;font-weight:700;min-height:58px;margin:0;border-radius:0}
+.bnav [role=tab] svg{width:22px;height:22px}
+.bnav [role=tab][aria-selected="true"]{color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
+.sum{background:var(--surface);border:1.5px solid var(--line);padding:14px;margin:12px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.sum .sdn{position:relative;width:116px;height:116px;flex:none}
+.sum .sdn svg{width:100%;height:100%;display:block}
+.sum .sdn .trk{fill:none;stroke:var(--line);stroke-width:10}
+.sum .sdn .fl{fill:none;stroke:var(--accent);stroke-width:10;stroke-linecap:butt;transform:rotate(-90deg);transform-origin:56px 56px}
+.sum .sdn.over .fl{stroke:var(--f)}
+.sum .sdc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.sum .sdc b{font-family:var(--font-num);font-size:24px}
+.sum .sdc small{font-size:11px;color:var(--muted)}
+.sum .sx{flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:9px}
+.sum .sl{font-family:var(--font-num);font-size:12px;color:var(--muted)}
+.sum .sl b{color:var(--ink)}
+.sbr .t{display:flex;justify-content:space-between;font-size:13px;font-weight:600}
+.sbr .t span:last-child{font-family:var(--font-num);font-weight:500}
+.sbr .t .ov{color:var(--f);font-weight:700}
+.sbr .b{height:7px;background:var(--line);margin-top:3px}
+.sbr .b i{display:block;height:100%}
+#tgd .dash{padding:10px 12px 14px}
+.morebtn{display:block;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--surface);padding:14px;margin:0 0 10px;color:var(--ink)}
+.morebtn small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+.morebtn:hover{border-color:var(--accent)}
+.backb{margin-bottom:10px}
 </style>
 
 <div class="wrap">
   <header class="topbar">
     <div class="ttl"><h1>Piano Pasti</h1><small id="dayCap">Giorno 1</small></div>
-    <div class="dash" id="dash" aria-label="Macro e obiettivi del giorno"></div>
     <span class="hgrp" role="group" aria-label="Cronologia"><button type="button" class="btn sm" data-act="undo" title="Annulla l'ultima modifica (Ctrl+Z)" disabled>&#8630; Annulla</button><button type="button" class="btn sm" data-act="redo" title="Ripeti (Ctrl+Maiusc+Z)" disabled>Ripeti &#8631;</button></span>
   </header>
 
-  <div class="stick" id="stick"><div class="mini num" id="mini" aria-hidden="true"></div>
-  <div class="tabstrip" role="tablist" aria-label="Pagine">
-    <button type="button" role="tab" id="tb-plan" data-act="tab" data-t="plan" aria-selected="true" aria-controls="tab-plan">Pianificazione</button>
-    <button type="button" role="tab" id="tb-shop" data-act="tab" data-t="shop" aria-selected="false" aria-controls="tab-shop" tabindex="-1">Lista della spesa</button>
-    <button type="button" role="tab" id="tb-pantry" data-act="tab" data-t="pantry" aria-selected="false" aria-controls="tab-pantry" tabindex="-1">Dispensa</button>
-    <button type="button" role="tab" id="tb-prep" data-act="tab" data-t="prep" aria-selected="false" aria-controls="tab-prep" tabindex="-1">Meal prep e conservazione</button>
-    <button type="button" role="tab" id="tb-week" data-act="tab" data-t="week" aria-selected="false" aria-controls="tab-week" tabindex="-1">Settimana e previsione</button>
-    <button type="button" role="tab" id="tb-avatar" data-act="tab" data-t="avatar" aria-selected="false" aria-controls="tab-avatar" tabindex="-1">Status</button>
-  </div></div>
+  <div class="stick" id="stick"><div class="mini num" id="mini" aria-hidden="true"></div></div>
   <div class="page">
 
-  <div id="tab-plan" class="panel" role="tabpanel" aria-labelledby="tb-plan">
+  <div id="tab-plan" class="panel" role="tabpanel" aria-label="Diario">
     <div class="daybar" id="daybar"></div>
+    <section class="sum" id="sumcard" aria-label="Riepilogo del giorno"></section>
+    <details class="genp" id="tgd"><summary>Obiettivi giornalieri</summary><div class="dash" id="dash" aria-label="Macro e obiettivi del giorno"></div></details>
 
     <section class="tablewrap" aria-label="Pasti della giornata"><div class="cols" id="cols"></div></section>
 
@@ -486,28 +521,43 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;font-si
     </details>
   </div>
 
-  <div id="tab-shop" class="panel" role="tabpanel" aria-labelledby="tb-shop" hidden><div id="shop"></div></div>
+  <div id="tab-shop" class="panel" role="tabpanel" aria-label="Spesa" hidden><div id="shop"></div></div>
 
-  <div id="tab-week" class="panel" role="tabpanel" aria-labelledby="tb-week" hidden>
+  <div id="tab-week" class="panel" role="tabpanel" aria-label="Settimana e previsione" hidden>
+    <button type="button" class="btn sm backb" data-act="tab" data-t="more">&lsaquo; Altro</button>
     <section class="wkbox" id="wkchart" aria-label="Riepilogo dei giorni"></section>
     <section class="wkbox" id="wl" aria-label="Previsione del peso"></section>
   </div>
 
-  <div id="tab-pantry" class="panel" role="tabpanel" aria-labelledby="tb-pantry" hidden>
+  <div id="tab-pantry" class="panel" role="tabpanel" aria-label="Dispensa" hidden>
     <section class="wkbox" id="ptbox" aria-label="Dispensa e ricette"></section>
   </div>
 
-  <div id="tab-avatar" class="panel" role="tabpanel" aria-labelledby="tb-avatar" hidden>
+  <div id="tab-avatar" class="panel" role="tabpanel" aria-label="Status" hidden>
     <section class="wkbox" id="avbox" aria-label="Status: avatar, acqua e peso"></section>
   </div>
 
-  <div id="tab-prep" class="panel" role="tabpanel" aria-labelledby="tb-prep" hidden><section class="prep" id="prep" aria-label="Programma di meal prep"></section></div>
+  <div id="tab-prep" class="panel" role="tabpanel" aria-label="Meal prep e conservazione" hidden><button type="button" class="btn sm backb" data-act="tab" data-t="more">&lsaquo; Altro</button><section class="prep" id="prep" aria-label="Programma di meal prep"></section></div>
+
+  <div id="tab-more" class="panel" role="tabpanel" aria-label="Altro" hidden>
+    <section class="wkbox" aria-label="Altre sezioni"><h2>Altro</h2>
+      <button type="button" class="morebtn" data-act="tab" data-t="prep"><b>Meal prep e conservazione</b><small>Cosa preparare in anticipo e quanto dura in frigo</small></button>
+      <button type="button" class="morebtn" data-act="tab" data-t="week"><b>Settimana e previsione</b><small>Riepilogo dei giorni e previsione del peso</small></button>
+    </section>
+  </div>
 
   </div>
 
   <footer>
     Prodotti Milbona e di supermercato: valori per 100 g da FatSecret Italia e schede prodotto. Dove è indicato "macro stimati" le kcal sono verificate ma i macro sono approssimati; le voci generiche usano tabelle nutrizionali standard. Pesi a crudo e al netto degli scarti come nel piano. Gli alimenti "affine" non sono nel piano. Nomi e formati dei prodotti sono indicativi: l'assortimento cambia, controlla l'etichetta in negozio. Il piano originale era valido 2 mesi dal 27/09/2024: per l'aggiornamento rivolgiti al tuo nutrizionista.
   </footer>
+<nav class="bnav" role="tablist" aria-label="Pagine">
+  <button type="button" role="tab" id="tb-plan" data-act="tab" data-t="plan" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M9 9h6M9 13h6"/></svg><span>Diario</span></button>
+  <button type="button" role="tab" id="tb-shop" data-act="tab" data-t="shop" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/><path d="M3 4h2.5l2.2 10.5h10l2-7.5H7"/></svg><span>Spesa</span></button>
+  <button type="button" role="tab" id="tb-pantry" data-act="tab" data-t="pantry" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v4H4z"/><path d="M5 8h14v12H5z"/><path d="M9 12h6"/></svg><span>Dispensa</span></button>
+  <button type="button" role="tab" id="tb-avatar" data-act="tab" data-t="avatar" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-6 15-6 16 0"/></svg><span>Status</span></button>
+  <button type="button" role="tab" id="tb-more" data-act="tab" data-t="more" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg><span>Altro</span></button>
+</nav>
 </div>
 <div id="pv" aria-hidden="true"></div>
 <div id="pop" role="listbox" id="pop" hidden></div>
@@ -812,17 +862,19 @@ function applyHist(s) {
   renderCols(); refreshNums();
 }
 function setTab(t, focus) {
-  ["plan", "shop", "pantry", "prep", "week", "avatar"].forEach(k => {
+  const bt = (t === "prep" || t === "week") ? "more" : t;
+  ["plan", "shop", "pantry", "prep", "week", "avatar", "more"].forEach(k => {
     const p = document.getElementById("tab-" + k); if (p) p.hidden = k !== t;
     const b = document.getElementById("tb-" + k);
-    if (b) { b.setAttribute("aria-selected", String(k === t)); b.tabIndex = k === t ? 0 : -1; if (focus && k === t) b.focus(); }
+    if (b) { b.setAttribute("aria-selected", String(k === bt)); b.tabIndex = k === bt ? 0 : -1; if (focus && k === bt) b.focus(); }
   });
+  try { window.scrollTo(0, 0); } catch (e) { /* ignora */ }
   try { localStorage.setItem("ppl-tab", t); } catch (e) { /* ignora */ }
 }
 document.addEventListener("keydown", ev => {
   const tb = ev.target.closest && ev.target.closest('[role="tab"]');
   if (!tb) return;
-  const ts = ["plan", "shop", "pantry", "prep", "week", "avatar"], i = ts.indexOf(tb.dataset.t), N = ts.length;
+  const ts = ["plan", "shop", "pantry", "avatar", "more"], i = ts.indexOf(tb.dataset.t), N = ts.length;
   let n = -1;
   if (ev.key === "ArrowRight") n = (i + 1) % N; else if (ev.key === "ArrowLeft") n = (i + N - 1) % N; else if (ev.key === "Home") n = 0; else if (ev.key === "End") n = N - 1;
   if (n >= 0) { ev.preventDefault(); setTab(ts[n], true); }
@@ -1952,6 +2004,16 @@ function renderDash() {
     box.querySelector(".dd").textContent = " · " + (over ? "+" + r0(v - tg) : left > 0.5 ? r0(left) + " mancano" : "ok");
     box.setAttribute("role", "img"); box.setAttribute("aria-label", x[1] + ": " + r0(v) + " di " + r0(tg) + " " + x[2]);
   });
+  const sc = $("#sumcard");
+  if (sc) {
+    const left = T.k - t.k, over = left < 0, fr = T.k > 0 ? Math.min(t.k / T.k, 1) : 0, CI = 276.5;
+    const bars = [["c", "Carboidrati", "var(--c)"], ["p", "Proteine", "var(--p)"], ["f", "Grassi", "var(--f)"]].map(x => {
+      const v = t[x[0]], g = T[x[0]], o = g > 0 && v > g * 1.03;
+      return '<div class="sbr"><div class="t"><span>' + x[1] + '</span><span>' + r0(v) + ' / ' + r0(g) + ' g' + (o ? ' <span class="ov">+' + r0(v - g) + '</span>' : '') + '</span></div><div class="b"><i style="width:' + (g > 0 ? Math.min(v / g, 1) * 100 : 0).toFixed(1) + '%;background:' + x[2] + '"></i></div></div>';
+    }).join("");
+    sc.innerHTML = '<div class="sdn' + (over ? ' over' : '') + '" role="img" aria-label="' + (over ? "Superate di " + r0(-left) : "Rimanenti " + r0(left)) + ' kcal"><svg viewBox="0 0 112 112" aria-hidden="true"><circle class="trk" cx="56" cy="56" r="44"/><circle class="fl" cx="56" cy="56" r="44" stroke-dasharray="' + (fr * CI).toFixed(1) + ' ' + CI + '"/></svg><div class="sdc"><b>' + r0(Math.abs(left)) + '</b><small>' + (over ? "kcal oltre" : "rimanenti") + '</small></div></div>' +
+      '<div class="sx"><div class="sl">Obiettivo <b>' + r0(T.k) + '</b> − Alimenti <b>' + r0(t.k) + '</b> = ' + (over ? "Oltre" : "Rimanenti") + ' <b>' + r0(Math.abs(left)) + '</b></div>' + bars + '</div>';
+  }
 }
 /* ---------- Offerte: ricerca volantini e note su dove hai visto il prodotto in offerta ---------- */
 const OKEY2 = "ppl-offers-v1";
@@ -2909,7 +2971,7 @@ function copyList(btn) {
 setTimeout(() => { offRefresh(false); }, 2500);
 setTimeout(bkRemind, 3500);
 try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* ignora */ }
-try { const tb = localStorage.getItem("ppl-tab"); if (tb === "shop" || tb === "pantry" || tb === "prep" || tb === "week" || tb === "avatar") setTab(tb); } catch (e) { /* ignora */ }
+try { const tb = localStorage.getItem("ppl-tab"); if (tb === "shop" || tb === "pantry" || tb === "prep" || tb === "week" || tb === "avatar" || tb === "more") setTab(tb); } catch (e) { /* ignora */ }
 /* le schede restano sotto la barra fissa degli obiettivi: ne misuro l'altezza */
 try {
   const tb = document.querySelector(".topbar"), setH = () => document.documentElement.style.setProperty("--tbh", tb.offsetHeight + "px");
