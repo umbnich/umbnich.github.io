@@ -474,6 +474,11 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .morebtn small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
 .morebtn:hover{border-color:var(--accent)}
 .backb{margin-bottom:10px}
+.clipbar{background:var(--surface);border:1.5px dashed var(--accent);padding:8px 12px;margin:10px 0 0;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:13px}
+.clipbar[hidden]{display:none}
+.clipbar b{font-weight:700}
+.clipbar .cl{flex:1 1 100%}
+.x.cp{font-size:11px;font-weight:700;width:auto;min-width:34px;padding:0 6px}
 </style>
 
 <div class="wrap">
@@ -487,6 +492,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 
   <div id="tab-plan" class="panel" role="tabpanel" aria-label="Diario">
     <div class="daybar" id="daybar"></div>
+    <div class="clipbar" id="clipbar" hidden></div>
     <section class="sum" id="sumcard" aria-label="Riepilogo del giorno"></section>
     <details class="genp" id="tgd"><summary>Obiettivi giornalieri</summary><div class="dash" id="dash" aria-label="Macro e obiettivi del giorno"></div></details>
 
@@ -1925,6 +1931,7 @@ function renderCols() {
   $("#cols").innerHTML = state.meals.map((m, mi) =>
     '<section class="col" data-mk="' + mealKind(m, mi) + '" aria-label="' + esc(m.name) + '"><div class="ch"><input id="nm_' + m.id + '" class="nm" type="text" maxlength="40" value="' + esc(m.name) + '" data-act="name" data-col="' + m.id + '" aria-label="Nome del pasto">' +
     '<button type="button" class="x fit" data-act="fit" data-col="' + m.id + '" title="Adatta le quantità a un obiettivo di calorie o proteine" aria-label="Adatta alle calorie il pasto ' + esc(m.name) + '">kcal</button>' +
+    '<button type="button" class="x cp" data-act="copymeal" data-col="' + m.id + '" title="Copia il pasto per incollarlo in altri giorni" aria-label="Copia il pasto ' + esc(m.name) + '">copia</button>' +
     '<button type="button" class="x st" data-act="savetpl" data-col="' + m.id + '" title=""Salva questo pasto tra i preferiti" aria-label="Salva il pasto ' + esc(m.name) + ' tra i preferiti">&#9733;</button>' +
     '<button type="button" class="x" data-act="delmeal" data-col="' + m.id + '" aria-label="Rimuovi pasto ' + esc(m.name) + '">&times;</button></div>' + fitHtml(m) +
     '<div class="rows">' + (m.rows.length ? m.rows.map((r, i) => rowHtml(m, i, r)).join("") : '<div class="empty">Nessun alimento. Aggiungi una riga.</div>') +
@@ -2094,6 +2101,27 @@ function weekHtml() {
   });
   return h + '</tbody></table>';
 }
+/* copia e incolla di un pasto tra i giorni */
+let CLIP = null;
+try { const c = JSON.parse(localStorage.getItem("ppl-clip-v1")); if (c && Array.isArray(c.rows)) CLIP = { name: String(c.name || "Pasto").slice(0, 40), kind: c.kind || null, rows: c.rows.filter(r => r && (r.id === null || I[r.id])).map(r => ({ id: r.id, g: Number(r.g) || 0 })) }; } catch (e) { /* nessun salvataggio */ }
+const clipSave = () => { try { localStorage.setItem("ppl-clip-v1", JSON.stringify(CLIP)); } catch (e) { /* ignora */ } };
+function renderClip() {
+  const el = $("#clipbar");
+  if (!el) return;
+  if (!CLIP) { el.hidden = true; el.innerHTML = ""; return; }
+  const t = CLIP.rows.reduce((a, r) => add(a, mac(r)), zero()), n = state.plan.length - state.cur - 1;
+  el.hidden = false;
+  el.innerHTML = '<span class="cl">Copiato: <b>' + esc(CLIP.name) + '</b> · ' + r0(t.k) + ' kcal · ' + CLIP.rows.length + (CLIP.rows.length === 1 ? ' alimento' : ' alimenti') + '</span>' +
+    '<button type="button" class="btn sm pri" data-act="pastemeal" data-s="here"' + (state.meals.length >= 12 ? ' disabled' : '') + '>Incolla nel Giorno ' + (state.cur + 1) + '</button>' +
+    '<button type="button" class="btn sm" data-act="pastemeal" data-s="next"' + (n < 1 ? ' disabled' : '') + '>Incolla nei ' + (n === 1 ? 'giorno seguente' : n > 1 ? n + ' giorni seguenti' : 'giorni seguenti') + '</button>' +
+    '<button type="button" class="btn sm" data-act="clipclear" aria-label="Svuota gli appunti">✕</button>';
+}
+function pasteMeal(scope) {
+  if (!CLIP) return;
+  const days = scope === "next" ? state.plan.slice(state.cur + 1) : [state.meals];
+  days.forEach(d => { if (d.length < 12) d.push({ id: newId(), name: CLIP.name, kind: CLIP.kind, rows: CLIP.rows.map(r => ({ id: r.id, g: r.g })) }); });
+  closePop(false); renderCols(); refreshNums();
+}
 function renderDays() {
   const n = state.plan.length;
   let h = '<div class="dtabs" role="group" aria-label="Giorno">' + state.plan.map((d, i) =>
@@ -2103,6 +2131,7 @@ function renderDays() {
   h += '<button type="button" class="btn sm" data-act="example">Ripristina esempio</button><button type="button" class="btn sm" data-act="clear">Svuota il giorno</button>';
   h += '</div><span class="hint">' + n + ' di 6 giorni</span>';
   $("#daybar").innerHTML = h;
+  renderClip();
   const dg = document.querySelector('[data-act="daygen"]');
   if (dg) dg.disabled = n >= 6;
 }
@@ -2853,6 +2882,15 @@ document.addEventListener("click", ev => {
     const d = document.documentElement, cur = d.getAttribute("data-theme") || (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"), nx = cur === "dark" ? "light" : "dark";
     d.setAttribute("data-theme", nx);
     try { localStorage.setItem("ppl-theme", nx); } catch (e) { /* ignora */ }
+  } else if (act === "copymeal") {
+    const m = meal(el.dataset.col);
+    if (m) {
+      CLIP = { name: m.name, kind: m.kind || null, rows: m.rows.filter(r => r.id && I[r.id] && r.g > 0).map(r => ({ id: r.id, g: r.g })) };
+      clipSave(); renderClip();
+      el.textContent = "✓"; setTimeout(() => { el.textContent = "copia"; }, 1200);
+    }
+  } else if (act === "pastemeal") { pasteMeal(el.dataset.s === "next" ? "next" : "here");
+  } else if (act === "clipclear") { CLIP = null; clipSave(); renderClip();
   } else if (act === "undo") { doUndo();
   } else if (act === "redo") { doRedo();
   } else if (act === "copyprep") {
