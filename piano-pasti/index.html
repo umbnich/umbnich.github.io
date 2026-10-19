@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#111111">
 <link rel="icon" href="icon-192.png">
@@ -474,6 +474,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .morebtn small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
 .morebtn:hover{border-color:var(--accent)}
 .backb{margin-bottom:10px}
+html,body{touch-action:pan-x pan-y}
 .clipbar{background:var(--surface);border:1.5px dashed var(--accent);padding:8px 12px;margin:10px 0 0;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:13px}
 .clipbar[hidden]{display:none}
 .clipbar b{font-weight:700}
@@ -3029,6 +3030,9 @@ try {
   const tb = document.querySelector(".topbar"), setH = () => document.documentElement.style.setProperty("--tbh", tb.offsetHeight + "px");
   setH(); if (window.ResizeObserver) new ResizeObserver(setH).observe(tb); else window.addEventListener("resize", setH);
 } catch (e) { /* ignora */ }
+
+/* niente zoom a due dita (iOS ignora user-scalable) */
+["gesturestart", "gesturechange", "gestureend"].forEach(t => document.addEventListener(t, ev => ev.preventDefault(), { passive: false }));
 
 </script>
 
